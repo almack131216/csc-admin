@@ -1,0 +1,5 @@
+Sortable lists...
+
+
+1. (sortable-list.php) Included on any page where sorting is requires
+2. sortable-list.php sends values to 'processor.php'
