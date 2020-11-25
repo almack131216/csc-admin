@@ -29,7 +29,7 @@
 		////////////////////////////////////////////////////////////
 		////////////////	 REMOVE COMMAS FROM PRICES     /////////
 		function Price_ForceNumeric($string) {
-			$removethese = array(",","-","£","$");
+			$removethese = array(",","-","ï¿½","$");
 				
 			for($tmpcount=0;$tmpcount<count($removethese);$tmpcount++){
 				$bad_char = trim($removethese[$tmpcount]);
@@ -303,8 +303,8 @@
 			$patterns = array("/(&)/", "/</", "/>/", "/'/" );
 			$replaces = array("+", "&lt;", "&gt;", "\'" );
 			*/
-			$patterns = array("/(&)/", "/</", "/>/", "/'/", "/£/" );
-			$replaces = array("&amp;", "<", ">", "\'", "&pound;" );
+			$patterns = array("/(&)/", "/</", "/>/", "/'/", "/â€™/", "/Ã‚&pound;/", "/Â£/" );
+			$replaces = array("&amp;", "<", ">", "\'", "\'", "&pound;", "&pound;" );
 			$data2 = preg_replace( $patterns, $replaces, $data );
 			$data2 = nl2br($data2);
 			

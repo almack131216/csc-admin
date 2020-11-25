@@ -16,6 +16,7 @@
 					theme_advanced_buttons4 : "pastetext",
 					document_base_url: "/",
 					relative_urls : true,
+					forced_root_block: "p"
 				});					
 			</script>
 EOD;
@@ -42,7 +43,8 @@ EOD;
 					theme_advanced_resizing : true,
 					document_base_url: "/",
 					relative_urls : true,
-					extended_valid_elements : "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]"
+					extended_valid_elements : "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
+					forced_root_block: "p"
 				});		
 			</script>
 EOD;
