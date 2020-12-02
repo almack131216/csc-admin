@@ -111,7 +111,9 @@ if($editid || $_REQUEST['id_xtra'] || ($_REQUEST['can'] || $_REQUEST['sid'])){
 				
 }else{
 	$isAddParent = true;
-	$_SESSION['ParentImgDir'] = GenerateImgDirName($TheDayToday);
+	$TheDayToday_image_dir = GenerateImgDirName($TheDayToday);
+	initImgDir($TheDayToday_image_dir);
+	// $_SESSION['ParentImgDir'] = GenerateImgDirName($TheDayToday);
 	$BuildTitle = "Pages &#124; Add new item";
 	$BuildTip = "Add to your catalogue using the form below";
 }
@@ -358,6 +360,7 @@ if( notloggedin() ) {
 			/// add record to database					
 			if ($post_success != 0) {
 				if($editid){
+					$debug .= '<br>!!! SQL !!! UPDATE';
 					$query = "UPDATE $db_clientTable_catalogue SET name='$name'";
 					for($i=0;$i<count($CustomDetails);$i++){
 						//if(${"detail_".$i}) 
@@ -367,6 +370,7 @@ if( notloggedin() ) {
 					$result = $db->mysql_query_log($query);
 					$uid = $editid;
 				}else{
+					$debug .= '<br>!!! SQL !!! INSERT';
 					if($category=='any') $category=0;
 					//REFERENCE: $query = "INSERT into $db_clientTable_catalogue (id_xtra, position_incat, position_initem, position, name, detail_1, detail_2, detail_3, detail_4, detail_5, detail_6, detail_7, detail_8, detail_9, detail_10, price, price2, category, subcategory, description, keywords, image_large, image_small, upload_date, spare_date, status, price_details) VALUES ('$my_id_xtra', '0', '999', '0', '$name', '$detail_1', '$detail_2', '$detail_3', '$detail_4', '$detail_5', '$detail_6', '$detail_7', '$detail_8', '$detail_9', '$detail_10', '$price', '$price2', '$category', '$subcategory', '$description', '$keywords', '$UploadFileName', '$UploadFileName', '$upload_date', '$spare_date', '$status', '$price_details')";
 					
@@ -379,7 +383,9 @@ if( notloggedin() ) {
 					for($i=0;$i<sizeof($FieldNames);$i++){
 						$query .= ", '${$FieldNames[$i]}'";
 					}
-					if($isAddParent) $query .= ",'2020/12'";
+					if($isAddParent){
+						$query .= ",'${$TheDayToday_image_dir}'";//2do
+					}
 					$query .= ")";
 					echo $query;
 					//exit();

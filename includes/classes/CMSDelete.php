@@ -4,10 +4,11 @@
 		
 		function DeleteItem($getAttributes){
 			global $db_clientTable_catalogue,$CMSShared,$CMSDebug;
-			global $db,$db_client,$siteroot,$gp_uploadPath;
+			global $db,$db_client,$siteroot,$gp_uploadPath,$debug;
 			
 			$getItemID = $getAttributes['itemID'];
 			$getFileOnly = $getAttributes['fileOnly'];
+			$getImageDir = $getAttributes['image_dir'];
 				
 			$more_query = "SELECT * FROM $db_clientTable_catalogue WHERE id=$getItemID";
 			if(!$getFileOnly) $more_query .=" OR id_xtra=$getItemID";
@@ -15,11 +16,11 @@
 			
 			if($more_result && mysql_num_rows($more_result)>=1) { // if 1									
 				for($tmp=0;$tmp<mysql_num_rows($more_result);$tmp++) { // FOR LOOP 1
-					$more_array 	= mysql_fetch_array($more_result);
-					$more_id		= $more_array['id'];
-					$more_id_xtra	= $more_array['id_xtra'];
-					$more_file		= $more_array['image_large'];
-					$more_file_small	= $more_array['image_small'];							
+					$more_array = mysql_fetch_array($more_result);
+					$more_id = $more_array['id'];
+					$more_id_xtra = $more_array['id_xtra'];
+					$more_file = $more_array['image_large'];
+					$more_file_small = $more_array['image_small'];						
 
 					// DELETE ITEM FROM DATABASE
 					if($getFileOnly){
@@ -30,11 +31,14 @@
 					$more_delete_result = $db->mysql_query_log($more_delete_query);
 					
 					// DELETE FILES ATTACHED					
-					$more_image_thumb = getImgDirSession('thumbs').$more_file;
-					$more_image = getImgDirSession('primary').$more_file;
-					$more_image_large = getImgDirSession('large').$more_file;
-					$more_image_highres = getImgDirSession('highres').$more_file;
-					$more_CustomThumb = getImgDirSession('thumbs').$more_file_small;
+					$more_image_thumb = getImgDir($getImageDir,'thumbs').$more_file;
+					$more_image = getImgDir($getImageDir,'primary').$more_file;
+					$more_image_large = getImgDir($getImageDir,'large').$more_file;
+					$more_image_highres = getImgDir($getImageDir,'highres').$more_file;
+					$more_CustomThumb = getImgDir($getImageDir,'thumbs').$more_file_small;
+
+					$debug .= '<br>!!! DELETE ITEM ('.$more_id.') !!!';
+					$debug .= '<br>!!! THUMB: '.$more_image_thumb;
 					
 					//echo 'MORE_ID: '.$getItemID;
 					if($CMSShared->FileExists($more_image_highres))	$CMSDebug->FileUnlink($more_image_highres);				

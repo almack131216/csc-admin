@@ -24,12 +24,12 @@ if (!empty($_REQUEST['uid'])) {
 		$debug .= '<br>[admin_catalogue_item_delete] q: '.$query;
 	}else{
 		$isDeleteParent = true;
-		$query 		= "SELECT * FROM $db_clientTable_catalogue WHERE id=$uid LIMIT 1";
+		$query = "SELECT * FROM $db_clientTable_catalogue WHERE id=$uid LIMIT 1";
 	}
-	$result 	= mysql_query($query);
+	$result = mysql_query($query);
 	if($result && mysql_num_rows($result) >= 1){
-		$ret_array	= mysql_fetch_array($result);
-		$my_id		= $ret_array['id'];
+		$ret_array = mysql_fetch_array($result);
+		$my_id = $ret_array['id'];
 		if(!empty($ret_array['id_xtra'])){
 			$ParentID = $ret_array['id_xtra'];
 			$my_id_xtra = $ret_array['id_xtra'];
@@ -39,12 +39,13 @@ if (!empty($_REQUEST['uid'])) {
 		$my_subcat = $ret_array['subcategory'];
 		
 		$my_image_dir = $ret_array['image_dir'];
-		initImgDir($my_image_dir);
-		$my_image_highres = getImgDirSession('highres').$ret_array['image_large'];
-		$my_image_large = getImgDirSession('large').$ret_array['image_large'];
-		$my_image_primary = getImgDirSession('primary').$ret_array['image_large'];
-		$my_image_thumb	 = getImgDirSession('thumbs').$ret_array['image_large'];
-		$my_filename = $ret_array['image_large'];		
+		$my_filename = $ret_array['image_large'];
+		$debug .= '<br>image_dir: '.$my_image_dir;
+		// initImgDir($my_image_dir);
+		$my_image_highres = getImgDir($my_image_dir,'highres').$my_filename;
+		$my_image_large = getImgDir($my_image_dir,'large').$my_filename;
+		$my_image_primary = getImgDir($my_image_dir,'primary').$my_filename;
+		$my_image_thumb	 = getImgDir($my_image_dir,'thumbs').$my_filename;				
 	}
 	
 	$tmpCatalogueData = $PageBuild->GetCatalogueData(0,0,$ParentID);	
@@ -88,22 +89,26 @@ if( notloggedin() ) {
 	if($my_id){		
 			
 		if (isset($_POST['delete'])) { // if 1
-			
-			$attributes = array('itemID'=>$my_id,'fileOnly'=>$fileOnly);
+			// $my_image_dir = '2020/12';
+			$attributes = array('itemID'=>$my_id,'image_dir'=>$my_image_dir,'fileOnly'=>$fileOnly);
+
+			// echo $debug;
+			// echo '>>>>>>>>>'.$my_image_dir;
+			// exit();
 			$CMSDelete->DeleteItem($attributes);							
 			
 			
-			$all_query = "SELECT * FROM $db_clientTable_catalogue ORDER by position";
-			$all_result = mysql_query($all_query);				
-			$all_num_rows = mysql_num_rows($all_result);
+			// $all_query = "SELECT * FROM $db_clientTable_catalogue ORDER by position";
+			// $all_result = mysql_query($all_query);				
+			// $all_num_rows = mysql_num_rows($all_result);
 								
 			
-			for($tmp = 1;$tmp <= $all_num_rows;$tmp++){					
-				$all_array 	= mysql_fetch_row($all_result);
-				//echo $tmp .' / ' . $all_num_rows .' , ';
-				$position_query = "UPDATE $db_clientTable_catalogue SET position='$tmp' WHERE id='$all_array[0]' LIMIT 1";
-				$position_result = mysql_query($position_query);//$db->mysql_query_log
-			}
+			// for($tmp = 1;$tmp <= $all_num_rows;$tmp++){					
+			// 	$all_array 	= mysql_fetch_row($all_result);
+			// 	//echo $tmp .' / ' . $all_num_rows .' , ';
+			// 	$position_query = "UPDATE $db_clientTable_catalogue SET position='$tmp' WHERE id='$all_array[0]' LIMIT 1";
+			// 	$position_result = mysql_query($position_query);//$db->mysql_query_log
+			// }
 			
 			$ReturnButton = '';
 			$ReturnButton .= '<div class="panel_good">';
@@ -165,6 +170,8 @@ if( notloggedin() ) {
 					if($fileOnly) $WarningPanel .= '<input type="hidden" name="fileOnly" value="1">';
 					$WarningPanel .= '<input type="hidden" name="prevpage" value="'.$my_prevpage.'">';
 					$WarningPanel .= '<input type="hidden" name="uid" value="'.$my_id.'">';
+					$WarningPanel .= '<input type="text" name="image_dir" value="'.$my_image_dir.'" readonly>';
+					$WarningPanel .= '<input type="text" name="parentid" value="'.$ParentID.'" readonly>';					
 					$WarningPanel .= '<input type="submit" name="delete" value="Delete" title="Delete Item" id="delete">';
 					$WarningPanel .= '</form>';		
 				$WarningPanel .= '</div>';

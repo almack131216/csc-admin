@@ -101,8 +101,9 @@ if(notloggedin()) {
 				//echo 'COUNT:'.count($arr_items);		
 				for($tmp_deletecount=0;$tmp_deletecount<count($arr_items);$tmp_deletecount++){ // FOR LOOP 1
 			
-					$my_id = $arr_items[$tmp_deletecount]['id'];					
-					$attributes = array('itemID'=>$my_id);
+					$my_id = $arr_items[$tmp_deletecount]['id'];
+					$my_image_dir = $arr_items[$tmp_deletecount]['image_dir'];					
+					$attributes = array('itemID'=>$my_id,'image_dir'=>$my_image_dir);
 					$CMSDelete->DeleteItem($attributes);				
 	
 				} // END FOR 1	

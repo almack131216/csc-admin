@@ -190,23 +190,24 @@
 		
 		//////////////////////////////////
 		//////////////////////////////////
-		//STEP 1.2: CUSTOM THUMBNAIL IMAGE		
-		if(!$suid && gp_enabled("CustomThumb") && (empty($my_id_xtra) || $YouTube==true)){
-			$BuildForm.= '<div class="'.$panel_CustomThumb.'">';
-			$BuildForm.= '<p><span class="steptitle">Step '.$stepnum.':</span> '.$message_CustomThumb.'</p>';
-				$BuildForm.= '<div class="inner_right">';
-					$BuildForm.= '<input type="file" name="upload_thumb" id="thumb_upload" />';
-					if($CMSShared->FileExists($my_CustomThumb)){
-						$ThumbPath = $gp_uploadPath['thumbs'].$my_CustomThumb_filename;
-						$BuildForm.= '<div id="CustomThumb">';
-							$BuildForm.= '<img src="'.$my_CustomThumb.'">';
-							$BuildForm.= '<a href="javascript:removeImage(\'CustomThumb\',\''.$my_id.'\',\''.$ThumbPath.'\')" title="Remove this Custom Thumbnail image?"><img src="includes/btns/generic_delete_sm.gif"></a>';
-						$BuildForm.= '</div>';
-					}
-				$BuildForm.= '</div>';
-			$BuildForm.= '</div>';
-			$stepnum++;
-		}
+		//STEP 1.2: CUSTOM THUMBNAIL IMAGE	
+		//2do - CULL	
+		// if(!$suid && gp_enabled("CustomThumb") && (empty($my_id_xtra) || $YouTube==true)){
+		// 	$BuildForm.= '<div class="'.$panel_CustomThumb.'">';
+		// 	$BuildForm.= '<p><span class="steptitle">Step '.$stepnum.':</span> '.$message_CustomThumb.'</p>';
+		// 		$BuildForm.= '<div class="inner_right">';
+		// 			$BuildForm.= '<input type="file" name="upload_thumb" id="thumb_upload" />';
+		// 			if($CMSShared->FileExists($my_CustomThumb)){
+		// 				$ThumbPath = $gp_uploadPath['thumbs'].$my_CustomThumb_filename;
+		// 				$BuildForm.= '<div id="CustomThumb">';
+		// 					$BuildForm.= '<img src="'.$my_CustomThumb.'">';
+		// 					$BuildForm.= '<a href="javascript:removeImage(\'CustomThumb\',\''.$my_id.'\',\''.$ThumbPath.'\')" title="Remove this Custom Thumbnail image?"><img src="includes/btns/generic_delete_sm.gif"></a>';
+		// 				$BuildForm.= '</div>';
+		// 			}
+		// 		$BuildForm.= '</div>';
+		// 	$BuildForm.= '</div>';
+		// 	$stepnum++;
+		// }
 		// END CUSTOM THUMB
 		
 		//////////////////////////////////

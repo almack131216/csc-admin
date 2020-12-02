@@ -91,9 +91,9 @@ function createRandomPassword() {
 //echo '<br/>(FB): (functions) SITEROOT:'.$siteroot.$gp_uploadPath;
 
 $missingimage = "_missingimage.jpg";
-$missingthumb = getImgDirSession('thumbs').$missingimage;
-$missingprimary = getImgDirSession('primary').$missingimage;
-$missinglarge = getImgDirSession('large').$missingimage;
+// $missingthumb = getImgDirSession('thumbs').$missingimage;
+// $missingprimary = getImgDirSession('primary').$missingimage;
+// $missinglarge = getImgDirSession('large').$missingimage;
 
 if(empty($amactive)){
 	global $amactiveDefault;
@@ -280,14 +280,15 @@ function GenerateImgDirName($getDate){
 }
 
 function initImgDir($getDir){
-	global $debug;
+	global $TheDayToday,$debug;
 
 	$debug .= '<p>!!!!!!!!!!!!!!!!!!!!!';
 	$debug .= '<br>!!! initImgDir !!!';
 	if(!$_SESSION['ParentImgDir']){
-		$_SESSION['ParentImgDir'] = $getDir;
-		$debug .= '<br>!!! initImgDir: $_SESSION[ParentImgDir] SET: '.$_SESSION['ParentImgDir'];
+		$_SESSION['ParentImgDir'] = GenerateImgDirName($TheDayToday);
+		$debug .= '<br>!!! initImgDir: $_SESSION[ParentImgDir] SET (TODAY): '.$_SESSION['ParentImgDir'];
 	}elseif($_SESSION['ParentImgDir'] && $getDir != $_SESSION['ParentImgDir']){
+		$_SESSION['ParentImgDir'] = $getDir;
 		$debug .= '<br>!!! initImgDir: $_SESSION[ParentImgDir] CHANGE: '.$_SESSION['ParentImgDir'];
 	}elseif($_SESSION['ParentImgDir'] && $getDir == $_SESSION['ParentImgDir']){
 		$debug .= '<br>!!! initImgDir: $_SESSION[ParentImgDir] NO CHANGE: '.$getDir.' ('.$_SESSION['ParentImgDir'].')';
