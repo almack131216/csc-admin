@@ -1,5 +1,10 @@
 <?php
 //$YouTube=true;
+$isAddParent = false;
+$isAddAttachment = false;
+$isEditParent = false;
+$isEditAttachment = false;
+
 $suid_PageAccess = true;
 if($_REQUEST['category'])			$cust_category		= $_REQUEST['category'];
 if($_REQUEST['subcategory'])		$cust_subcategory	= $_REQUEST['subcategory'];
@@ -19,11 +24,14 @@ include("includes/classes/CMSMakeImages.php");
 
 if($editid || $_REQUEST['id_xtra'] || ($_REQUEST['can'] || $_REQUEST['sid'])){
 
+	$debug .= '<p>[admin_catalogue_upload]</p>';
 	if($_REQUEST['id_xtra']){
-		$AddingAttachment = true;		
+		$isAddAttachment = true;		
 		$ParentID = $_REQUEST['id_xtra'];
+		$debug .= '>>>> 1 > Adding attachment... ('.$_REQUEST['id_xtra'].')';
+		$debug .= '<br>>>>> 1.2 > Adding attachment... FOLDER: (request: '.$_REQUEST['image_dir'].', session: '.$_SESSION['ParentImgDir'].')';
 	}else{
-
+		$debug .= '>>>> 2';
 		//Custom DEBUG Checking script
 		if(!$editid && ($_REQUEST['can'] || $_REQUEST['sid'])){
 			$query = "SELECT id,detail_3,detail_6 FROM $db_clientTable_catalogue WHERE category=6";
@@ -34,21 +42,42 @@ if($editid || $_REQUEST['id_xtra'] || ($_REQUEST['can'] || $_REQUEST['sid'])){
 				$query .= " AND detail_3='{$_REQUEST['sid']}'";
 			}
 			$query .= " ORDER BY id ASC LIMIT 1";
-			echo $query;
+			$debug .= '<br> 2.1 > query'.$query;
 			$result = mysql_query($query);
 			if($result && mysql_num_rows($result)==1){
 				$staffRow = mysql_fetch_array($result);
 				header("Location: http://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?jumped=true&editid=".$staffRow['id']);
 			}
 		}elseif($editid && !$_REQUEST['sid']){
+			$debug .= '<br> 2.2';
 			$ParentID = $editid;
-			$query = "SELECT id,id_xtra,category,subcategory FROM $db_clientTable_catalogue WHERE id=$editid";
+			$query = "SELECT id,id_xtra,category,subcategory,image_dir FROM $db_clientTable_catalogue WHERE id=$editid";
 			$result = mysql_query($query);
 			if($result){
 				$editidRow = mysql_fetch_array($result);
 				$cust_category=$editidRow['category'];
 				$cust_subcategory=$editidRow['subcategory'];
-				if(!empty($editidRow['id_xtra']))	$ParentID = $editidRow['id_xtra'];
+				if($editidRow['image_dir']){
+					// $_SESSION['ParentImgDir'] = $editidRow['image_dir'];
+					initImgDir($editidRow['image_dir']);
+				}else{
+					$_SESSION['ParentImgDir'] = '';
+				}
+				
+				$debug .= '<br>>>>> 2.3 >> category: '.$cust_category;
+				if(!empty($editidRow['id_xtra'])){
+					$isEditAttachment = true;
+					$ParentID = $editidRow['id_xtra'];
+					$q = "SELECT id,id_xtra,image_dir FROM $db_clientTable_catalogue WHERE id=$ParentID";
+					$r = mysql_query($q);
+					if($r){						
+						$ParentRow = mysql_fetch_array($r);
+						initImgDir($ParentRow['image_dir']);
+						$debug .= '<br>SET PARENT DIR: '.$ParentRow['image_dir'];
+					}				
+				}else{
+					$isEditParent = true;
+				}
 			}
 		}
 	}
@@ -61,12 +90,12 @@ if($editid || $_REQUEST['id_xtra'] || ($_REQUEST['can'] || $_REQUEST['sid'])){
 	if($tmpCatalogueData['categoryName']) $BuildTip .= $tmpCatalogueData['categoryLink'];
 	if($tmpCatalogueData['subcategoryName']) $BuildTip .= ' &gt; '.$tmpCatalogueData['subcategoryLink'];
 
-	if(($AddingAttachment || $ParentID!=$editid) && $tmpCatalogueData['itemLink']) $BuildTip .= " &gt; ".$tmpCatalogueData['itemLink'];
-	if((!$AddingAttachment && $ParentID==$editid) && $tmpCatalogueData['itemName']) $BuildTip .= " &gt; ".$tmpCatalogueData['itemName'];
+	if(($isAddAttachment || $ParentID!=$editid) && $tmpCatalogueData['itemLink']) $BuildTip .= " &gt; ".$tmpCatalogueData['itemLink'];
+	if((!$isAddAttachment && $ParentID==$editid) && $tmpCatalogueData['itemName']) $BuildTip .= " &gt; ".$tmpCatalogueData['itemName'];
 	
 	
 	
-	if(!$AddingAttachment){
+	if(!$isAddAttachment){
 		if($tmpCatalogueData['categoryID'])	$cust_category	= $tmpCatalogueData['categoryID'];
 		if($tmpCatalogueData['subcategoryID'])	$cust_subcategory	= $tmpCatalogueData['subcategoryID'];
 	
@@ -81,6 +110,8 @@ if($editid || $_REQUEST['id_xtra'] || ($_REQUEST['can'] || $_REQUEST['sid'])){
 	$my_ParentName = $tmpCatalogueData['itemNameRaw'];
 				
 }else{
+	$isAddParent = true;
+	$_SESSION['ParentImgDir'] = GenerateImgDirName($TheDayToday);
 	$BuildTitle = "Pages &#124; Add new item";
 	$BuildTip = "Add to your catalogue using the form below";
 }
@@ -111,7 +142,7 @@ if( notloggedin() ) {
 	$catcheck_query		= "SELECT * FROM $db_clientTable_catalogue_cats";
 	$catcheck_result	= mysql_query($catcheck_query);
 	$catcheck_count		= mysql_num_rows($catcheck_result);
-	//echo '<br />(FB): '.$siteroot.$gp_uploadPath['large'];
+	//echo '<br />(FB): '.getImgDirSession('large');
 	if ($catcheck_count == 0) { // IF CATCHECK
 		echo '<p class="prompt">There are currently no categories listed in your database</p>';
 		if(gp_enabled("add_category")){
@@ -123,7 +154,7 @@ if( notloggedin() ) {
 		}
 	} else { // ELSE CATCHECK
 	
-		//echo '<br>(FB):EDIT ID (GET)= '.$editid;
+		// echo '<br>(FB):EDIT ID (GET)= '.$editid;
 		/// END ///
 		
 		
@@ -174,7 +205,7 @@ if( notloggedin() ) {
 
 		
 		/// END ///
-		
+		//echo '???';
 		include("admin_catalogue_item_data.php");
 		
 		// GET ID of item... used when adding additional images, which rely on 'id_xtra' being identical to 'id' of primary item
@@ -193,22 +224,22 @@ if( notloggedin() ) {
 		/////////////////////////////////////////////
 		/// CHECK DATA SUBMITTED AND UPLOAD FORM DATA
 		if (isset($_POST['updater'])) { // IF DATA HAS BEEN SUBMITTED
-			$post_success	= 1; // form submission is successful until told otherwise ("$post_success = 1")
+			$post_success = 1; // form submission is successful until told otherwise ("$post_success = 1")
 			
 			//INITIALISE empty values in-case nothing is picked up (avoids 'else' conditions on EVERY field)
-			$description	= '';
-			$keywords		= '';
-			$name			= '';
+			$description = '';
+			$keywords = '';
+			$name = '';
 			for($i=0;$i<count($CustomDetails);$i++){
 				if($CustomDetails[$i]['inuse']==1) ${"detail_".$CustomDetails[$i]['id']} = '';
 			}
 		
-			$category		= 0;
-			$subcategory	= 0;
-			$status			= 1;
-			$price			= 0;
-			$price2			= 0;
-			$price_details	= '';
+			$category = 0;
+			$subcategory = 0;
+			$status = 1;
+			$price = 0;
+			$price2 = 0;
+			$price_details = '';
 			
 			//////////////////////////////////////////////////////////////////////
 			/// ENSURE default values do not get processed / pass as OK (required)			
@@ -221,7 +252,7 @@ if( notloggedin() ) {
 				if($CustomDetails[$i]['inuse']==1 && $_POST['detail_'.$CustomDetails[$i]['id']] == $gp_defVal_item['detail_'.$CustomDetails[$i]['id']])		$_POST['detail_'.$CustomDetails[$i]['id']] = "";
 			}
 			if($_POST['description']	== $gp_defVal_item['description']){		$_POST['description'] = "";}
-			if($_POST['keywords']		== $gp_defVal_item['keywords']){		$_POST['keywords'] = "";}			
+			if($_POST['keywords']		== $gp_defVal_item['keywords']){		$_POST['keywords'] = "";}		
 			
 			/////////////////////////////
 			/// check for name (required)
@@ -234,21 +265,26 @@ if( notloggedin() ) {
 					$name = $my_name;
 				}
 			} else {
-				if($my_id_xtra == 0){
+				if($isAddParent){
 					$post_success = 0;
 					$panel_name	= 'panel_error';
 				}				
 			}
-			
+
+			//////////////////////
+			/// image_dir
+			if ($isAddParent && isset($_POST['image_dir']) ) {		
+				initImgDir($_POST['image_dir']);										
+			}			
 				
 			//////////////////////
 			/// CHECK PRICE CHANGE			
-			if ($my_id_xtra == 0 && isset($_POST['price']) && !empty($_POST['price']) ) {		
+			if ($isAddParent && isset($_POST['price']) && !empty($_POST['price']) ) {		
 				$price = $_POST['price'];
 				$price = $CMSTextFormat->stripCrap2_in($price);				
 				$price = $CMSTextFormat->Price_ForceNumeric($price);										
 			}
-			if ($my_id_xtra == 0 && isset($_POST['price2']) && !empty($_POST['price2']) ) {		
+			if ($isAddParent && isset($_POST['price2']) && !empty($_POST['price2']) ) {		
 				$price2 = $_POST['price2'];
 				$price2 = $CMSTextFormat->stripCrap2_in($price2);				
 				$price2 = $CMSTextFormat->Price_ForceNumeric($price2);										
@@ -292,7 +328,20 @@ if( notloggedin() ) {
 			if (!empty($_POST['upload_date_day']))		$tmpday = $_POST['upload_date_day'];
 			if (!empty($_POST['upload_date_month']))	$tmpmonth = $_POST['upload_date_month'];
 			if (!empty($_POST['upload_date_year']))		$tmpyear = $_POST['upload_date_year'];
-			$upload_date = $tmpyear.'-'.$tmpmonth.'-'.$tmpday; //2009-01-03
+			$upload_date = $tmpyear.'-'.$tmpmonth.'-'.$tmpday; //2009-01-03			
+
+			if($isAddParent){
+				// $image_dir = $tmpyear.'/'.$tmpmonth;
+				// $image_dir = $_SESSION['ParentImgDir'];
+				// $_SESSION['ParentImgDir'] = $image_dir;
+				$image_dir = GenerateImgDirName($TheDayToday);
+				$_SESSION['ParentImgDir'] = $image_dir;
+				$newImgDir = "../images/".$image_dir;
+				checkFolderExists("",$newImgDir);
+				checkFolderExists("thumb",$newImgDir);
+				checkFolderExists("primary",$newImgDir);
+				checkFolderExists("large",$newImgDir);				
+			}
 			
 			/// Publish Date
 			$tmpdaySpare = '00';
@@ -325,19 +374,20 @@ if( notloggedin() ) {
 					for($i=0;$i<sizeof($FieldNames);$i++){
 						$query .= ", ${FieldNames[$i]}";
 					}
+					if($isAddParent) $query .= ",image_dir";
 					$query .= ") VALUES ('$my_id_xtra','$UploadFileName'";//,'$UploadFileName'
 					for($i=0;$i<sizeof($FieldNames);$i++){
 						$query .= ", '${$FieldNames[$i]}'";
 					}
+					if($isAddParent) $query .= ",'2020/12'";
 					$query .= ")";
-					//echo $query;
+					echo $query;
 					//exit();
 					$result = $db->mysql_query_log($query);
 					$uid = mysql_insert_id();					
 				}
 								
-				if ($result) {
-					
+				if ($result) {					
 					////////////////////////////						
 					/// UPLOAD CUSTOM THUMB IMAGE												
 					if($_FILES['upload_thumb']['name'] && (!$my_id_xtra || $YouTube==true)){
@@ -351,7 +401,7 @@ if( notloggedin() ) {
 						
 						$UploadThumb = $_FILES['upload_thumb']['tmp_name'];
 						$UploadFileName = "th_".$tmpName."_".$uid.".".$filetype;
-						$my_CustomThumb_withpath	= $siteroot.$gp_uploadPath['thumbs'].$UploadFileName;
+						$my_CustomThumb_withpath = getImgDirSession('thumbs').$UploadFileName;
 						move_uploaded_file($UploadThumb,$my_CustomThumb_withpath);
 						
 						if($CMSShared->FileExists($my_CustomThumb) && $my_CustomThumb != $my_CustomThumb_withpath) unlink($my_CustomThumb);
@@ -406,8 +456,8 @@ if( notloggedin() ) {
 							$UploadFileName = $tmpName."_".$uid.".".$filetype;
 							
 							////////////// Move the file over
-							$my_largeimage_withpath	= $siteroot.$gp_uploadPath['large'].$UploadFileName;
-							$my_highresimage_withpath = $siteroot.$gp_uploadPath['highres'].$UploadFileName;				
+							$my_largeimage_withpath = getImgDirSession('large').$UploadFileName;
+							$my_highresimage_withpath = getImgDirSession('highres').$UploadFileName;				
 							//echo '<br />(FB)FROM: '.$UploadFile.'<br />';//SHOW PATHS WHEN UPLOAD FAILS
 							//echo '<br />(FB)TO: '.$my_largeimage_withpath.'<br />';//SHOW PATHS WHEN UPLOAD FAILS
 							
@@ -427,10 +477,11 @@ if( notloggedin() ) {
 									//echo '<br />(FB) MAKE THUMBNAILS';
 									if($CMSShared->FileExists($my_image_thumb)) unlink($my_image_thumb);
 									if($CMSShared->FileExists($my_image_primary)) unlink($my_image_primary);
+									if($CMSShared->FileExists($my_image_highres)) unlink($my_image_highres);
 									
 									//echo '<br/>MAKE THUMB IMAGE:'.$my_largeimage_withpath.'/'.$UploadFileName;
 									$CMSMakeImages->MakeImage($my_largeimage_withpath,$UploadFileName,"thumb");
-									//if($my_id_xtra == 0){
+									//if($isAddParent){
 										//echo '<br/>MAKE PRIMARY IMAGE:'.$my_largeimage_withpath.'/'.$UploadFileName;
 										$CMSMakeImages->MakeImage($my_largeimage_withpath,$UploadFileName,"primary");
 									//}
@@ -438,11 +489,11 @@ if( notloggedin() ) {
 									$tmpDimensions = @getimagesize($my_largeimage_withpath);// get original (ACTUAL) dimensions								
 									if($ThinUpload==false && (filesize($my_largeimage_withpath)>$gp_maxfilesize_large || ($tmpDimensions[0]>$gp_large_width || $tmpDimensions[1]>$gp_large_height))){
 										
-										if(gp_enabled("highres") && $CMSMakeImages->MakeImage($my_largeimage_withpath,$UploadFileName,"highres")){										
-											$CMSMakeImages->MakeImage($my_highresimage_withpath,$UploadFileName,"large");
-										}else{
-											$CMSMakeImages->MakeImage($my_largeimage_withpath,$UploadFileName,"large");
-										}
+										$CMSMakeImages->MakeImage($my_largeimage_withpath,$UploadFileName,"large");
+										
+										// if(gp_enabled("highres")){										
+											$CMSMakeImages->MakeImage($my_highresimage_withpath,$UploadFileName,"highres");
+										// }
 									}
 								} // (upload): end if 3 ...isimage()
 								
@@ -453,18 +504,18 @@ if( notloggedin() ) {
 								
 								
 								// ORDER POSITIONS
-								if (empty($my_id_xtra) && !$editid) {									
-									$all_query = "SELECT * FROM $db_clientTable_catalogue ORDER by position";
-									$all_result = mysql_query($all_query);					
-									$all_num_rows = mysql_num_rows($all_result);												
+								// if (empty($my_id_xtra) && !$editid) {									
+								// 	$all_query = "SELECT * FROM $db_clientTable_catalogue ORDER by position";
+								// 	$all_result = mysql_query($all_query);					
+								// 	$all_num_rows = mysql_num_rows($all_result);												
 									
-									for($tmpcount = 0;$tmpcount < $all_num_rows;$tmpcount++) {									
-										$all_array 	= mysql_fetch_row($all_result);
-										//echo $tmpcount .' / ' . $all_num_rows .' , ';
-										$position_query = "UPDATE $db_clientTable_catalogue SET position=$tmpcount WHERE id = '".$all_array[0]."'";
-										$position_result = $db->mysql_query_log($position_query);	
-									}
-								}
+								// 	for($tmpcount = 0;$tmpcount < $all_num_rows;$tmpcount++) {									
+								// 		$all_array 	= mysql_fetch_row($all_result);
+								// 		//echo $tmpcount .' / ' . $all_num_rows .' , ';
+								// 		$position_query = "UPDATE $db_clientTable_catalogue SET position=$tmpcount WHERE id = '".$all_array[0]."'";
+								// 		$position_result = $db->mysql_query_log($position_query);	
+								// 	}
+								// }
 								
 								$message_largeimage = 'File successfully uploaded';
 								$panel_largeimage = 'panel_good';		
@@ -486,8 +537,8 @@ if( notloggedin() ) {
 					//////
 					//If name has changed and SEO filename needs regenerating...
 					if($editid && $_POST['GenerateFileName'] && $NameChanged){
-						$oldName = $siteroot.$gp_uploadPath['large']."_test6.jpg";
-						$newName = $siteroot.$gp_uploadPath['large']."_test7.jpg";
+						$oldName = getImgDirSession('large')."_test6.jpg";
+						$newName = getImgDirSession('large')."_test7.jpg";
 						$attributes = array('oldName'=>$oldName,'newName'=>$newName);
 						$CMSMakeImages->RenameFile($attributes);
 						//$getAttributes['oldName'],$getAttributes['newName']
@@ -497,7 +548,7 @@ if( notloggedin() ) {
 						
 						$UploadThumb = $_FILES['upload_thumb']['tmp_name'];
 						$UploadFileName = "th_".$tmpName."_".$uid.".".$filetype;
-						$my_CustomThumb_withpath	= $siteroot.$gp_uploadPath['thumbs'].$UploadFileName;
+						$my_CustomThumb_withpath	= getImgDirSession('thumbs').$UploadFileName;
 						move_uploaded_file($UploadThumb,$my_CustomThumb_withpath);
 						
 						if($CMSShared->FileExists($my_CustomThumb) && $my_CustomThumb != $my_CustomThumb_withpath) unlink($my_CustomThumb);
@@ -531,7 +582,7 @@ if( notloggedin() ) {
 				mysql_close();
 				$_FILES = array(); //Destroy variables
 				
-				if (empty($my_id_xtra) || $my_id_xtra == 0) {
+				if ($isAddParent) {
 					$ParentID = $uid;
 				}else{
 					$ParentID = $my_id_xtra;
@@ -593,13 +644,19 @@ if( notloggedin() ) {
 			
 			if(!$suid && gp_enabled("related")) $SubNavInner .= '<li class="related"><a href="admin_catalogue_item_related.php?editid='.$ParentID.'" title="related information & documents">related</a></li>';
 			//$SubNavInner .= '<li class="list"><a href="admin_catalogue_all.php?thisList=catalogue_cats&category='.$my_ParentCat.'" title="this category">this category</a></li>';
-			if(!$suid) $SubNavInner .= '<li class="delete"><a href="admin_catalogue_item_delete.php?uid='.$editid.'&prevpage=item_edit" title="delete '.$CommonCustomWords['item'].'">delete</a></li>';		
+			if(!$suid) $SubNavInner .= '<li class="delete"><a href="admin_catalogue_item_delete.php?uid='.$editid.'&parentid='.$ParentID.'&prevpage=item_edit" title="delete '.$CommonCustomWords['item'].'">delete</a></li>';		
 			$SubNavInner .= '</ul>';
 			echo $SubNavInner;
 		}
 		// (END) INNER NAVIGATION
 	
 	} // END IF (CATCHECK)
+
+	$debug .= '<br><br>!!! PAGE SETTINGS !!!';
+	$debug .= '<br>$isAddParent: '.$isAddParent;
+	$debug .= '<br>$isAddAttachment: '.$isAddAttachment;
+	$debug .= '<br>$isEditParent: '.$isEditParent;
+	$debug .= '<br>$isEditAttachment: '.$isEditAttachment;
 	
 }
 

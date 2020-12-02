@@ -53,10 +53,11 @@
 		//////////// FUNCTION: scale images in table
 		function ImageScale($my_image_withpath, $filename, $value, $factor, $scaleby, $quality, $size) {
 			/*global $my_image_withpath, $filename;*/
-			global $width_new, $height_new, $width_orig, $height_orig, $my_image_thumb, $my_image_primary;
-			global $siteroot,$gp_uploadPath;
+			global $width_new, $height_new, $width_orig, $height_orig, $my_image_thumb, $my_image_primary, $my_image_highres;
+			global $siteroot,$debug;
 			global $CMSMakeImages,$CMSShared;
 			
+			$debug .= '<br>$my_image_withpath: '.$my_image_withpath;
 			$tmp = @getimagesize($my_image_withpath);
 			
 			// get original (ACTUAL) dimensions
@@ -93,13 +94,13 @@
 			}	
 			
 			
-			$type = $CMSShared->GetFileType($filename);
+			$type = $CMSShared->GetFileType($filename);			
 			
-			
-			$loc_thumbs = $siteroot.$gp_uploadPath['thumbs'];
-			$loc_primary = $siteroot.$gp_uploadPath['primary'];
-			$loc_highres = $siteroot.$gp_uploadPath['highres'];
-			$loc_large = $siteroot.$gp_uploadPath['large'];	
+			$loc_thumbs = getImgDirSession('thumbs');
+			$loc_primary = getImgDirSession('primary');
+			$loc_highres = getImgDirSession('highres');
+			$loc_large = getImgDirSession('large');
+			$debug .= '<br>?????????????????'.$loc_large;	
 			
 			if ($quality != 100){		
 				
@@ -114,6 +115,8 @@
 						$my_image_thumb = $loc_thumbs.$filename;
 					}elseif($size == "primary"){
 						$my_image_primary = $loc_primary.$filename;
+					}elseif($size == "highres"){
+						$my_image_highres = $loc_highres.$filename;
 					}
 					
 				} else {
@@ -122,6 +125,8 @@
 						$my_image_thumb = $loc_thumbs.$filename;
 					}elseif($size == "primary"){
 						$my_image_primary = $loc_primary.$filename;
+					}elseif($size == "highres"){
+						$my_image_highres = $loc_highres.$filename;
 					}			
 				}		
 					
@@ -131,6 +136,8 @@
 					$my_image_thumb = $loc_thumbs.$filename;
 				}elseif($size == "primary"){
 					$my_image_primary = $loc_primary.$filename;
+				}elseif($size == "highres"){
+					$my_image_highres = $loc_highres.$filename;
 				}	
 			}
 			
@@ -140,22 +147,22 @@
 		////////////////////////////////////////////////////////////
 		////////////////////////// 	 MAKE THUMBNAIL IMAGE  /////////
 		function ThumbMe($format, $image_name, $width_new, $height_new, $quality, $size){
-			global $siteroot,$gp_uploadPath;
+			global $siteroot;
 			global $CMSMakeImages;
 			
-			$loc_highresimages = $siteroot.$gp_uploadPath['highres'];
-			$loc_largeimages = $siteroot.$gp_uploadPath['large'];
-			$loc_primary = $siteroot.$gp_uploadPath['primary'];
-			$loc_thumbs = $siteroot.$gp_uploadPath['thumbs'];
+			$loc_highres = getImgDirSession('highres');
+			$loc_large = getImgDirSession('large');
+			$loc_primary = getImgDirSession('primary');
+			$loc_thumbs = getImgDirSession('thumbs');
 			
 			if($size == "thumb"){
 				$loc_dynamic = $loc_thumbs;
 			}elseif($size == "primary"){
 				$loc_dynamic = $loc_primary;
 			}elseif($size == "highres"){
-				$loc_dynamic = $loc_highresimages;
+				$loc_dynamic = $loc_highres;
 			}else{
-				$loc_dynamic = $loc_largeimages;
+				$loc_dynamic = $loc_large;
 			}
 			
 			if($destimg=imageCreate($width_new, $height_new) ) {
@@ -168,22 +175,22 @@
 			///////////// MAKE JPEG THUMBNAIL
 			switch($format) {
 				case "jpg":
-					$srcimg=ImageCreateFromJPEG($loc_largeimages.$image_name) or die("problem opening source image $loc_largeimages $image_name");	
+					$srcimg=ImageCreateFromJPEG($loc_large.$image_name) or die("problem opening source image $loc_large > $image_name");	
 					ImageCopyResized($destimg,$srcimg,0,0,0,0,$width_new,$height_new,ImageSX($srcimg),ImageSY($srcimg) ) or die("Problem in resizing");	
 					//ImageJPEG($destimg,$loc_dynamic.$image_name, $quality) or die("Problem in saving");
-					$CMSMakeImages->MakeImage_MergeCenter($loc_largeimages.$image_name, $loc_dynamic.$image_name, $width_new, $height_new);
+					$CMSMakeImages->MakeImage_MergeCenter($loc_large.$image_name, $loc_dynamic.$image_name, $width_new, $height_new);
 					break;			
 					
 					///////////// MAKE PNG THUMBNAIL
 				case "png":
-					$srcimg=ImageCreateFromPNG($loc_largeimages.$image_name) or die("problem opening source image $loc_largeimages $image_name ");	
+					$srcimg=ImageCreateFromPNG($loc_large.$image_name) or die("problem opening source image $loc_large $image_name ");	
 					ImageCopyResized($destimg,$srcimg,0,0,0,0,$width_new,$height_new,ImageSX($srcimg),ImageSY($srcimg) ) or die("Problem in resizing");	
 					ImagePNG($destimg,$loc_dynamic.$image_name, $quality) or die("Problem in saving");
 					break;
 					
 					///////////// MAKE PNG THUMBNAIL
 				case "gif":
-					$srcimg=ImageCreateFromGIF($loc_largeimages.$image_name) or die("problem opening source image $loc_largeimages $image_name ");	
+					$srcimg=ImageCreateFromGIF($loc_large.$image_name) or die("problem opening source image $loc_large $image_name ");	
 					ImageCopyResized($destimg,$srcimg,0,0,0,0,$width_new,$height_new,ImageSX($srcimg),ImageSY($srcimg) ) or die("Problem in resizing");	
 					ImageGIF($destimg,$loc_dynamic.$image_name) or die("Problem in saving");
 					break;
@@ -199,6 +206,7 @@
 		//\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 		
 		function MakeImage_MergeCenter($src, $dst, $dstx, $dsty){
+			global $debug;
 		
 			$makeRegardless = true;
 			//$src = original image location
@@ -206,10 +214,10 @@
 			//$dstx = user defined width of image
 			//$dsty = user defined height of image
 			
-			echo '<br>1. original location:'.$src;
-			echo '<br>2. destination:'.$dst;
-			echo '<br>3. width:'.$dstx;
-			echo '<br>4. height:'.$dsty;
+			$debug .= '<br>1. original location:'.$src;
+			$debug .= '<br>2. destination:'.$dst;
+			$debug .= '<br>3. width:'.$dstx;
+			$debug .= '<br>4. height:'.$dsty;
 			
 			$allowedExtensions = 'jpg jpeg gif png';
 			

@@ -42,7 +42,7 @@ if( notloggedin() ) {
 					$filesrc=$dir.$my_filename;			
 					if($CMSShared->IsImage($my_filename)){
 						//echo '<img src="thumb.php?file='.$filesrc.'&size=66&quality=60&nocache=0" alt="'.$my_filename.'">';
-						echo '<img src="timthumb.php?src='.$filesrc.'&w=66&q=60" alt="'.$my_filename.'">';
+						echo '<img src="'.$filesrc.'" width="66px" alt="'.$my_filename.'">';
 						echo $CMSAddOns->Thickbox("filePreview",$filesrc,$my_filename,"");
 					}elseif(!$CMSShared->IsImage($my_filename) && !empty($my_filename) ){
 						$fileType = $CMSShared->GetFileType($my_filename);

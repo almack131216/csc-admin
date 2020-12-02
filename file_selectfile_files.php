@@ -50,7 +50,7 @@
 					
 					if($CMSShared->IsImage($my_filename)){					
 						//echo '<img src="thumb.php?file='.$filesrc.'&size=66&quality=60&nocache=0" alt="'.$my_filename.'" title="'.$my_filename.'">';
-						echo '<img src="timthumb.php?src='.$filesrc.'&w=66&q=60" alt="'.$my_filename.'" title="'.$my_filename.'">';
+						echo '<img src="'.$filesrc.'" width="66px" alt="'.$my_filename.'" title="'.$my_filename.'">';
 					}else{
 						$fileType = $CMSShared->GetFileType($my_filename);
 						if (!$CMSShared->FileExists($filesrc)) {

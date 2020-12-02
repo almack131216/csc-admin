@@ -30,11 +30,11 @@
 					$more_delete_result = $db->mysql_query_log($more_delete_query);
 					
 					// DELETE FILES ATTACHED					
-					$more_image_thumb 	= $siteroot.$gp_uploadPath['thumbs'].$more_file;
-					$more_image 		= $siteroot.$gp_uploadPath['primary'].$more_file;
-					$more_image_large 	= $siteroot.$gp_uploadPath['large'].$more_file;
-					$more_image_highres = $siteroot.$gp_uploadPath['highres'].$more_file;
-					$more_CustomThumb = $siteroot.$gp_uploadPath['thumbs'].$more_file_small;
+					$more_image_thumb = getImgDirSession('thumbs').$more_file;
+					$more_image = getImgDirSession('primary').$more_file;
+					$more_image_large = getImgDirSession('large').$more_file;
+					$more_image_highres = getImgDirSession('highres').$more_file;
+					$more_CustomThumb = getImgDirSession('thumbs').$more_file_small;
 					
 					//echo 'MORE_ID: '.$getItemID;
 					if($CMSShared->FileExists($more_image_highres))	$CMSDebug->FileUnlink($more_image_highres);				

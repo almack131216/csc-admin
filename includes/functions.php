@@ -16,8 +16,12 @@ if(!$CMSImages){require_once('classes/CMSImages.php');}
 function notloggedin(){
 	global $suid_PageAccess;
 
-	//echo '<br>1:suid: '.$_SESSION['suid'].'/'.$suid_PageAccess;
-	//echo '<br>2:cid: '.$_SESSION['cid'].'/'.$suid_PageAccess;
+	// if($_SERVER['HTTP_HOST']=="localhost:8080"){
+	// 	return false;
+	// 	echo '<br>1:suid: '.$_SESSION['suid'].'/'.$suid_PageAccess;
+	// 	echo '<br>2:cid: '.$_SESSION['cid'].'/'.$suid_PageAccess;
+	// }
+	
 
 	if ( ($_SESSION['suid'] && $suid_PageAccess) || (!$_SESSION['suid'] AND !empty($_SESSION['cid']) AND (substr($_SERVER['PHP_SELF'], -16) != 'admin_logout.php')) ) {
 		return false;
@@ -86,10 +90,10 @@ function createRandomPassword() {
 ////////////////////////// 	 IMAGE DIRECTORIES    //////////
 //echo '<br/>(FB): (functions) SITEROOT:'.$siteroot.$gp_uploadPath;
 
-$missingimage			= "_missingimage.jpg";
-$missingthumb			= $siteroot.$gp_uploadPath['thumbs'].$missingimage;
-$missingprimary			= $siteroot.$gp_uploadPath['primary'].$missingimage;
-$missinglarge			= $siteroot.$gp_uploadPath['large'].$missingimage;
+$missingimage = "_missingimage.jpg";
+$missingthumb = getImgDirSession('thumbs').$missingimage;
+$missingprimary = getImgDirSession('primary').$missingimage;
+$missinglarge = getImgDirSession('large').$missingimage;
 
 if(empty($amactive)){
 	global $amactiveDefault;
@@ -262,5 +266,219 @@ function show_contact_admin() {
 	global $adminroot;
 	echo '<a href="'.$adminroot.'help_request.php" title="Send Support Request">contact CMS Support</a>';
 }
+
+// 201129
+
+function GenerateImgDirName($getDate){
+	global $TheDayToday,$debug;
+
+	$dateX = explode("-",$getDate);
+    $newDirStr = $dateX[0]."/".$dateX[1];    
+			
+	$debug .= '<br>[GenerateImgDirName] TheDayToday: '.$newDirStr;
+	return $newDirStr;
+}
+
+function initImgDir($getDir){
+	global $debug;
+
+	$debug .= '<p>!!!!!!!!!!!!!!!!!!!!!';
+	$debug .= '<br>!!! initImgDir !!!';
+	if(!$_SESSION['ParentImgDir']){
+		$_SESSION['ParentImgDir'] = $getDir;
+		$debug .= '<br>!!! initImgDir: $_SESSION[ParentImgDir] SET: '.$_SESSION['ParentImgDir'];
+	}elseif($_SESSION['ParentImgDir'] && $getDir != $_SESSION['ParentImgDir']){
+		$debug .= '<br>!!! initImgDir: $_SESSION[ParentImgDir] CHANGE: '.$_SESSION['ParentImgDir'];
+	}elseif($_SESSION['ParentImgDir'] && $getDir == $_SESSION['ParentImgDir']){
+		$debug .= '<br>!!! initImgDir: $_SESSION[ParentImgDir] NO CHANGE: '.$getDir.' ('.$_SESSION['ParentImgDir'].')';
+	}
+	$debug .= '<br>!!!!!!!!!!!!!!!!!!!!!</br>';
+}
+
+function switchDirName($getSize){
+	switch($getSize){
+		case 'thumbs':
+			return 'th';
+			break;
+		case 'large':
+			return 'lg';
+			break;
+		case 'highres':
+			return 'hi';
+			break;
+		default:
+		return 'pr';		
+	}
+}
+
+function getImgDirSession($getSize){
+	global $siteroot,$ParentID,$debug;
+
+	// if(!$_SESSION['ParentImgDir']) $debug .= '<p>------------------------> getImgDirSession: image_dir NOT SET</p>';
+	// if($_SESSION['ParentImgDir']) $debug .= '<p><------------------------ getImgDirSession: image_dir SET: '.$_SESSION['ParentImgDir'].'</p>';
+
+	if($_SESSION['ParentImgDir']){
+		$thisImgDir = $_SESSION['ParentImgDir'];
+
+		$swDir = switchDirName($getSize);
+		// switch($getSize){
+		// 	case 'thumbs':
+		// 		$swDir = 'th';
+		// 		break;
+		// 	case 'large':
+		// 		$swDir = 'lg';
+		// 		break;
+		// 	case 'highres':
+		// 		$swDir = 'hi';
+		// 		break;
+		// 	default:
+				
+		// 	$swDir = 'pr';		
+		// }
+		$imgDir = $siteroot.'images/'.$thisImgDir.'/'.$swDir.'/';
+	}else{
+		$_SESSION['ParentImgDir'] = '';
+		$imgDir = $siteroot.'images_catalogue/'.$getSize.'/';
+	}
+	return $imgDir;
+}
+
+function getImgDir($getImgDir,$getSize){
+	global $siteroot,$ParentID;
+
+	// if(!$_SESSION['ParentImgDir']) echo '<p>------------------------> getImgDir: image_dir NOT SET</p>';
+	// if($_SESSION['ParentImgDir']) echo '<p><------------------------ getImgDir: image_dir SET: '.$_SESSION['ParentImgDir'].'</p>';
+
+	if($getImgDir){
+		// switch($getSize){
+		// 	case 'thumbs':
+		// 		$swDir = 'th';
+		// 		break;
+		// 	case 'large':
+		// 		$swDir = 'lg';
+		// 		break;
+		// 	case 'highres':
+		// 		$swDir = 'hi';
+		// 		break;
+		// 	default:
+				
+		// 	$swDir = 'pr';		
+		// }
+		$swDir = switchDirName($getSize);
+		$imgDir = $siteroot.'images/'.$getImgDir.'/'.$swDir.'/';
+	}else{
+		$imgDir = $siteroot.'images_catalogue/'.$getSize.'/';
+	}
+	return $imgDir;
+}
+
+
+function isAttachment($getIdXtra){
+    if($getIdXtra==0 || $getIdXtra=='') return false;
+    return true;
+}
+// CHECK folder exists...
+
+function returnToDir($getSize){
+    switch($getSize){
+        case "thumb":
+            $getSize = '/th/';
+            break;
+        case "large":
+            $getSize = '/lg/';
+            break;
+        default:
+            $getSize = '/pr/';
+    }
+    return $getSize;
+}
+
+function checkFolderExists($getSize,$newDir){
+    global $foldersCreated,$tableTitle;
+
+    $getSize = returnToDir($getSize);
+
+    if($getSize){
+        $newDir = $newDir.$getSize;//thumb/primary/large
+    }
+    // CHECK / folders exist..
+    if(file_exists( $newDir ) ){
+        $foldersCreated ++;
+        // $tableTitle .= '<p class="info">['.$newDir.'] FOLDER EXISTS</p>';
+    }else{//if not, mkdir
+        if(!file_exists( $newDir ) && mkdir($newDir, 0755, true)){
+            $foldersCreated ++;
+            $tableTitle .= '<p class="success">['.$newDir.'] FOLDER CREATED</p>';
+        }else{
+            $tableTitle .= '<p class="fatal">BASE FOLDER NOT CREATED</p>';
+        }                       
+    }
+}
+// (END) CHECK folder exists...
+
+// CHECK file exists...
+function checkFileExists( $getSize, $getFilename ){
+    global $imgPath,$newDir,$filesMoved,$filesMovedTotal,$table;
+
+    switch($getSize){
+        case "thumb":
+            $imgPathLive = 'https://www.classicandsportscar.ltd.uk/images_catalogue/thumbs/'.$getFilename;
+            $imgPathFrom = $imgPath.'thumbs/'.$getFilename;
+            $imgPathTo = $newDir.'/th/'.$getFilename;
+            break;
+        case "large":
+            $imgPathLive = 'https://www.classicandsportscar.ltd.uk/images_catalogue/large/'.$getFilename;
+            $imgPathFrom = $imgPath.'large/'.$getFilename;
+            $imgPathTo = $newDir.'/lg/'.$getFilename;
+            break;
+        default:
+            $imgPathLive = 'https://www.classicandsportscar.ltd.uk/images_catalogue/'.$getFilename;
+            $imgPathFrom = $imgPath.$getFilename;
+            $imgPathTo = $newDir.'/pr/'.$getFilename;
+    }
+
+    if(file_exists( $imgPathFrom )){
+        $table .= '<span class="info">moving...'.$imgPathTo.'</span>';
+        if(rename($imgPathFrom, $imgPathTo)) $filesMoved ++;$filesMovedTotal ++;
+    }else{
+        if(file_exists( $imgPathTo )){
+            $filesMoved ++;
+            $filesMovedTotal ++;
+            $table .= '<span class="good">['.$getSize.'] file already moved</span>';
+        }else{
+            $table .= '<img src="'.$imgPathLive.'" class="'.$getSize.'">';
+            $table .= '<span class="error">['.$getSize.'] cannot find file</span>';
+        }
+    }
+}
+// (END) CHECK file exists...
+
+// CHECK file exists...
+function returnLiveImage( $getSize, $getDir, $getFilename ){
+    global $imgPath,$newDir,$filesMoved,$table;
+
+    $dirs = [];
+    $dirs['thumb'] = "thumbs/";
+    $dirs['primary'] = "";
+    $dirs['large'] = "large/";
+
+    switch($getDir){
+        case "from":
+            $switchDir = $imgPath;            
+            break;
+        case "to":
+            $switchDir = $newDir;
+            $dirs['thumb'] = "/th/";
+            $dirs['primary'] = "/pr/";
+            $dirs['large'] = "/lg/";
+            break;
+        case "live":
+            $switchDir = 'https://www.classicandsportscar.ltd.uk/images_catalogue/';           
+            break;
+    }
+
+    return '<img src="'.$switchDir.$dirs[$getSize].$getFilename.'" class="'.$getSize.'">';
+}
+// (END) CHECK file exists...
 
 ?>

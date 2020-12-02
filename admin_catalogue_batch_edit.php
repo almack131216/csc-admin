@@ -54,23 +54,23 @@ if(notloggedin()) {
 		
 				
 		for($tmp_itemcount=0;$tmp_itemcount<count($arr_id);$tmp_itemcount++) {
-			$arr_id_curr	= $arr_id[$tmp_itemcount];
-			$item_query	= "SELECT * FROM $db_clientTable_catalogue WHERE id='$arr_id_curr' LIMIT 1";
-			$item_result	= mysql_query($item_query);
-			$ret_array		= mysql_fetch_array($item_result);				
-			$my_id			= $ret_array['id'];
+			$arr_id_curr = $arr_id[$tmp_itemcount];
+			$item_query = "SELECT * FROM $db_clientTable_catalogue WHERE id='$arr_id_curr' LIMIT 1";
+			$item_result = mysql_query($item_query);
+			$ret_array = mysql_fetch_array($item_result);				
+			$my_id = $ret_array['id'];
 			
-			$my_image		 	= $siteroot.$gp_uploadPath['thumbs'].$ret_array['image_large'];
-			$my_image_large 	= $siteroot.$gp_uploadPath['large'].$ret_array['image_large'];
-			$my_image_thumb 	= $siteroot.$gp_uploadPath['thumbs'].$ret_array['image_large'];
-			$my_filename		= $ret_array['image_large'];										
+			$my_image = getImgDirSession('thumbs').$ret_array['image_large'];
+			$my_image_large = getImgDirSession('large').$ret_array['image_large'];
+			$my_image_thumb = getImgDirSession('thumbs').$ret_array['image_large'];
+			$my_filename = $ret_array['image_large'];										
 
 			
 			$rowcolor = $CMSShared->GetRowColor($tmp_itemcount,$colors);					
 			
 			echo '<tr class="body_general" bgcolor='.$rowcolor.'>';					
 			
-			// (just image) echo '<td align="center" valign="middle"><img src="' . $siteroot.$gp_uploadPath['thumbs'] . $ret_array['image_large'] .'"></td>';
+			// (just image) echo '<td align="center" valign="middle"><img src="' . getImgDirSession('thumbs') . $ret_array['image_large'] .'"></td>';
 			echo '<td align="center">';
 			echo $CMSImages->GetThumb($my_image_large, $my_image_thumb, $my_filename, "true");
 			echo '</td>';

@@ -26,6 +26,10 @@ if(isset($_GET['editid'])){
 if(isset($_GET['id_xtra'])){
 	$my_id_xtra = $_GET['id_xtra'];
 }
+if(isset($_GET['image_dir'])){
+	$my_image_dir = $_GET['image_dir'];
+	initImgDir($my_image_dir);
+}
 
 
 if(!empty($siteroot)){
@@ -38,6 +42,9 @@ if(!empty($siteroot)){
 	}
 	if($my_id_xtra){
 		echo '<input type="hidden" name="id_xtra" value="'.$my_id_xtra.'">';
+	}
+	if($my_image_dir){
+		echo '<input type="hidden" name="image_dir" value="'.$my_image_dir.'">';
 	}
 	$dir = $siteroot."uploads/";
 	//$dir_folder = array($dir

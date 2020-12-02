@@ -20,7 +20,7 @@
 		// SHOW ADDITIONAL IMAGES	
 		//$Content.= '<br>(FB) my_id:'.$my_id;
 		//$Content.= '<br>(FB) my_id_xtra:'.$my_id_xtra;
-		$more_query		= "SELECT * FROM $db_clientTable_catalogue";
+		$more_query = "SELECT * FROM $db_clientTable_catalogue";//2do CR left join
 		if ($my_id_xtra != 0) { //if we've selected one of the additional images to edit			
 			$more_query	.= " WHERE id_xtra=$my_id_xtra OR id=$my_id_xtra"; // select ALL, including 1st image (one to whom the id_xtra is created from)
 		} else {
@@ -46,18 +46,21 @@
 				for($tmp_more=1;$tmp_more<=$more_count;$tmp_more++) {											
 					$SelectItem = "";
 					$FileReplace = "";
-					$more_array			= mysql_fetch_array($more_result);
-					$more_my_id			= $more_array['id'];
-					//$more_my_cat		= $more_array['category'];
-					$more_my_name		= $more_array['name'];
-					$my_image_large	= $siteroot.$gp_uploadPath['large'].$more_array['image_large'];
-					$my_image_thumb	= $siteroot.$gp_uploadPath['thumbs'].$more_array['image_large'];
-					$more_filename		= $more_array['image_large'];
+					$more_array = mysql_fetch_array($more_result);
+					$more_my_id = $more_array['id'];
+					//$more_my_cat = $more_array['category'];
+					$more_my_name = $more_array['name'];
+					if(!empty($more_array['image_dir']) && $more_array['id_xtra']==0 && $more_array['image_dir']!=$_SESSION['ParentImgDir']){
+						initImgDir($more_array['image_dir']);
+					}
+					$my_image_large = getImgDirSession('large').$more_array['image_large'];
+					$my_image_thumb = getImgDirSession('thumbs').$more_array['image_large'];
+					$more_filename = $more_array['image_large'];
 					$TableID = $more_my_id;
-
 					//$Content.= '<br>(FB): more_filename:'.$more_filename;
 					//$Content.= '<br>(FB): my_image_thumb:'.$my_image_thumb;
-					//$Content.= '<br>(FB): my_image_large:'.$my_image_large;
+					// $Content.= '<br>(FB): my_image_large: <img src="https://www.classicandsportscar.ltd.uk/images_catalogue/large/'.$more_array['image_large'].'" width="50px">';
+					// $Content.='<img src="'.$my_image_large.'" width="50px">';
 
 					$my_image_thumb	= $CMSImages->CheckImageExists("thumb",$my_image_large,$more_filename);
 						
@@ -80,6 +83,7 @@
 					}
 					
 					$FilePanel .= '<a href="admin_catalogue_upload.php?editid='.$more_my_id.'">';
+					// $FilePanel .= '<img src="'.$my_image_thumb.'">';
 					$FilePanel .= $CMSImages->GetThumb($my_image_large, $my_image_thumb, $more_filename, "false");
 					$FilePanel .= '</a>';
 					
@@ -87,7 +91,7 @@
 					if($SelectItem) $FilePanel .= $SelectItem;
 					if($FileReplace) $FilePanel .= $FileReplace;
 					$FilePanel .= '<a href="#" title="Move '.$CommonCustomWords['item'].'" class="Move"><img src="includes/icons/icon_item_move.gif" border="0"></a>';											
-					if($CMSShared->FileExists($my_image_large)) $FilePanel .= '&nbsp;<a href="admin_catalogue_item_delete.php?uid='.$tmpID.'&fileOnly=1&prevpage=item_edit" title="Delete File"><img src="includes/icons/icon_item_delete.gif" border="0"></a>';
+					// if($CMSShared->FileExists($my_image_large)) $FilePanel .= '&nbsp;<a href="admin_catalogue_item_delete.php?uid='.$tmpID.'&fileOnly=1&prevpage=item_edit" title="Delete File"><img src="includes/icons/icon_item_delete.gif" border="0"></a>';
 					$FilePanel .= '</li>';		
 				}
 				$FilePanel .= '</ul>';
@@ -97,14 +101,14 @@
 				include("includes/sortable-list.php");//drag-n-drop
 
 				if (!empty($my_id_xtra)) {					
-					$getcat_query	= "SELECT * FROM $db_clientTable_catalogue WHERE id='$my_id_xtra' LIMIT 1";
-					$getcat_result	= mysql_query($getcat_query);
+					$getcat_query = "SELECT * FROM $db_clientTable_catalogue WHERE id='$my_id_xtra' LIMIT 1";
+					$getcat_result = mysql_query($getcat_query);
 					if ($getcat_result){				
-						$getcat_array	= mysql_fetch_array($getcat_result);
-						$my_category	= $getcat_array['category'];
-						$my_status		= $getcat_array['status'];
-						$my_status_old	= $my_status;
-						$my_cat_old 	= $c; //this is needed otherwise it shows as title change
+						$getcat_array = mysql_fetch_array($getcat_result);
+						$my_category = $getcat_array['category'];
+						$my_status = $getcat_array['status'];
+						$my_status_old = $my_status;
+						$my_cat_old = $c; //this is needed otherwise it shows as title change
 					}
 				}
 					
@@ -131,7 +135,7 @@
 		
 		
 		if ( $my_id_xtra != 0 ) {
-			$ParentID = $my_id_xtra;
+			$ParentID = $my_id_xtra;			
 		} else {
 			$ParentID = $my_id;			
 		}
@@ -144,6 +148,7 @@
 	//hidden fields
 	if($my_id_xtra) $BuildForm.= '<input type="hidden" name="id_xtra" value='.$my_id_xtra.'>';
 	if($editid) $BuildForm.= '<input type="hidden" name="editid" value="'.$editid.'">';
+	// if($my_image_dir) $BuildForm.= '<input type="hidden" name="image_dir" value="'.$my_image_dir.'">';
 	$BuildForm.= '<input type="hidden" name="updater" value="'.$updated.'">';
 		
 	// stepnum needs to be a variable as some features will be hidden when uploading to existing item(additional images)
@@ -454,6 +459,7 @@
 			//////////////////////
 			///  ITEM PUBLISH DATE								
 			$BuildForm.= '<div class="panel_oneline">';
+			$BuildForm.= '<input type="text" name="image_dir" value="'.$_SESSION['ParentImgDir'].'" readonly>';
 			$BuildForm.= '<p><span class="steptitle">Step '.$stepnum.':</span> Publish date';
 			$BuildForm.= '<div class="inner_right">';
 			

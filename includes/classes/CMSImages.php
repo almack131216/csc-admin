@@ -10,7 +10,7 @@
 			global $siteroot,$gp_uploadPath;
 			global $preview_image_large, $preview_image_thumb, $preview_image;	
 			global $my_image_withpath, $my_image_large, $my_image_thumb;
-			global $missingimage,$missingthumb,$missinglarge;
+			global $missingimage;
 			//global $ret_true_false;
 			global $image_name, $my_image_thumb;
 			global $width_new, $height_new, $width_orig, $height_orig;
@@ -93,16 +93,16 @@
 		// This OPENS and CLOSES the image file to see if it exists
 		// This was implemented as !file_exists does not work (This function will not work on remote files as the file to be examined must be accessible via the servers filesystem.)
 		function CheckImageExists($ret_imagesize,$ret_imagepath,$ret_filename){
-			global $my_image_thumb, $missingthumb;
-			global $my_image_large, $missinglarge;
+			global $my_image_thumb,$my_image_large;
+			global $missingimage;
 			global $adminroot,$siteroot,$gp_uploadPath;
 			global $CMSShared;
 			
 			switch($ret_imagesize){
 				case "thumb":
 					if($CMSShared->IsImage($ret_filename)){
-						if (!(@fclose(@fopen($ret_imagepath, "r"))) || $ret_imagepath == $siteroot.$gp_uploadPath['thumbs']) {				
-							return $missingthumb;
+						if (!(@fclose(@fopen($ret_imagepath, "r"))) || $ret_imagepath == getImgDirSession('thumbs')) {				
+							return getImgDirSession('thumbs').$missingimage;
 					    }else{
 						    return $my_image_thumb;
 						}				
@@ -111,8 +111,8 @@
 				case "large":		
 					if($CMSShared->IsImage($ret_filename)){
 						if (!(@fclose(@fopen($ret_imagepath, "r")))) {
-						    $my_image_thumb = $missingthumb;
-						    return $missinglarge;
+						    $my_image_thumb = getImgDirSession('thumbs').$missingimage;
+						    return getImgDirSession('large').$missingimage;
 						 }else{
 							return $my_image_large;
 						}				   

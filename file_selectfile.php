@@ -10,6 +10,7 @@ if(isset($_REQUEST['editid']))		$editid = $_REQUEST['editid'];
 if(isset($_REQUEST['category']))	$my_cat = $_REQUEST['category'];
 if(isset($_REQUEST['subcategory']))	$my_subcat = $_REQUEST['subcategory'];
 if(isset($_REQUEST['id_xtra']))		$my_id_xtra = $_REQUEST['id_xtra'];
+if(isset($_REQUEST['image_dir']))	$my_image_dir = $_REQUEST['image_dir'];
 
 
 if(!empty($siteroot)){
@@ -27,6 +28,8 @@ if(!empty($siteroot)){
 		if($my_cat) echo '<input type="hidden" name="subcategory" value="'.$my_subcat.'">';		
 		// if id_xtra
 		if($my_id_xtra) echo '<input type="hidden" name="id_xtra" value="'.$my_id_xtra.'">';
+		// if image_dir
+		if($my_image_dir) echo '<input type="hidden" name="image_dir" value="'.$my_image_dir.'">';
 		
 		require("file_selectfile_files.php");
 		

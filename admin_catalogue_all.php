@@ -197,24 +197,26 @@ if( notloggedin() ) {
 		echo '<div class="panel">';	
 		
 		for($tmpcount=0;$tmpcount<sizeof($itemArray);$tmpcount++){
-			$my_id 				= $itemArray[$tmpcount]['id'];
-			$my_name			= stripslashes($itemArray[$tmpcount]['name']);
-			$my_index			= $itemArray[$tmpcount]['id_index'];
-			$my_position		= $itemArray[$tmpcount]['position'];
-			$my_detail_1 		= $itemArray[$tmpcount]['detail_1'];
+			$my_id = $itemArray[$tmpcount]['id'];
+			$my_name = stripslashes($itemArray[$tmpcount]['name']);
+			$my_index = $itemArray[$tmpcount]['id_index'];
+			$my_position = $itemArray[$tmpcount]['position'];
+			$my_detail_1 = $itemArray[$tmpcount]['detail_1'];
 			
-			$my_categoryName 	= get_category($itemArray[$tmpcount]['category'],"name","catalogue_cats");
-			$my_subcategoryName	= get_category($itemArray[$tmpcount]['subcategory'],"name","catalogue_subcats");			
-			$my_status			= $itemArray[$tmpcount]['status'];
-			$statusID			= "statusID_".$my_id;
-			$my_price			= $itemArray[$tmpcount]['price'];					
-			$my_date			= $itemArray[$tmpcount]['upload_date'];			
-			$my_date			= $CMSTextFormat->FormatDate($my_date,"cms");
-			
-			$filename			= $itemArray[$tmpcount]['image_large'];
-			$my_image_large		= $siteroot.$gp_uploadPath['large'].$filename;
-			$my_image_primary	= $siteroot.$gp_uploadPath['primary'].$filename;
-			$my_image_thumb		= $siteroot.$gp_uploadPath['thumbs'].$filename;
+			$my_categoryName = get_category($itemArray[$tmpcount]['category'],"name","catalogue_cats");
+			$my_subcategoryName = get_category($itemArray[$tmpcount]['subcategory'],"name","catalogue_subcats");			
+			$my_status = $itemArray[$tmpcount]['status'];
+			$statusID = "statusID_".$my_id;
+			$my_price = $itemArray[$tmpcount]['price'];					
+			$my_date = $itemArray[$tmpcount]['upload_date'];			
+			$my_date = $CMSTextFormat->FormatDate($my_date,"cms");
+			$my_image_dir = $itemArray[$tmpcount]['image_dir'];
+
+			$filename = $itemArray[$tmpcount]['image_large'];
+			$my_image_thumb = getImgDir($my_image_dir,'thumbs').$filename;
+			$my_image_primary = getImgDir($my_image_dir,'primary').$filename;
+			$my_image_large = getImgDir($my_image_dir,'large').$filename;
+			$my_image_highres = getImgDir($my_image_dir,'highres').$filename;
 			
 				
 			// PRINT TABLE HEADERS

@@ -1,4 +1,8 @@
 <?php
+//left join
+
+$isDeleteParent = false;
+$isDeleteAttachment = false;
 $suid_PageAccess = true;
 if(isset($_REQUEST['prevpage'])) $my_prevpage = $_REQUEST['prevpage'];			
 if(!empty($_REQUEST['fileOnly'])) $fileOnly = true;
@@ -10,7 +14,18 @@ $BuildTip = "Delete: ";
 if (!empty($_REQUEST['uid'])) {
 	$uid = $_REQUEST['uid'];
 	$ParentID = $uid;
-	$query 		= "SELECT * FROM $db_clientTable_catalogue WHERE id=$uid LIMIT 1";
+	if(!empty($_REQUEST['parentid']) && $_REQUEST['parentid']!=$uid){
+		$isDeleteAttachment = true;
+		$s = "select c.*, cp.image_dir";
+		$f = " from catalogue AS c left join catalogue AS cp";
+		$o = " on c.id_xtra = cp.id";
+		$w = " where c.id = $uid LIMIT 1";
+		$query = $s.$f.$o.$w;
+		$debug .= '<br>[admin_catalogue_item_delete] q: '.$query;
+	}else{
+		$isDeleteParent = true;
+		$query 		= "SELECT * FROM $db_clientTable_catalogue WHERE id=$uid LIMIT 1";
+	}
 	$result 	= mysql_query($query);
 	if($result && mysql_num_rows($result) >= 1){
 		$ret_array	= mysql_fetch_array($result);
@@ -19,15 +34,17 @@ if (!empty($_REQUEST['uid'])) {
 			$ParentID = $ret_array['id_xtra'];
 			$my_id_xtra = $ret_array['id_xtra'];
 		}
-		$my_name	= $ret_array['name'];
-		$my_cat		= $ret_array['category'];
-		$my_subcat	= $ret_array['subcategory'];
+		$my_name = $ret_array['name'];
+		$my_cat = $ret_array['category'];
+		$my_subcat = $ret_array['subcategory'];
 		
-		$my_image_highres	= $siteroot.$gp_uploadPath['highres'].$ret_array['image_large'];
-		$my_image_large		= $siteroot.$gp_uploadPath['large'].$ret_array['image_large'];
-		$my_image_primary	= $siteroot.$gp_uploadPath['primary'].$ret_array['image_large'];
-		$my_image_thumb		= $siteroot.$gp_uploadPath['thumbs'].$ret_array['image_large'];
-		$my_filename		= $ret_array['image_large'];		
+		$my_image_dir = $ret_array['image_dir'];
+		initImgDir($my_image_dir);
+		$my_image_highres = getImgDirSession('highres').$ret_array['image_large'];
+		$my_image_large = getImgDirSession('large').$ret_array['image_large'];
+		$my_image_primary = getImgDirSession('primary').$ret_array['image_large'];
+		$my_image_thumb	 = getImgDirSession('thumbs').$ret_array['image_large'];
+		$my_filename = $ret_array['image_large'];		
 	}
 	
 	$tmpCatalogueData = $PageBuild->GetCatalogueData(0,0,$ParentID);	
@@ -162,6 +179,10 @@ if( notloggedin() ) {
 		echo '<p class="error">Operator error. Item has not been recognised and so cannot be deleted</p>';
 		echo $CancelButton;
 	}
+
+	$debug .= '<br><br>!!! PAGE SETTINGS !!!';
+	$debug .= '<br>$isDeleteParent: '.$isDeleteParent;
+	$debug .= '<br>$isDeleteAttachment: '.$isDeleteAttachment;
 
 }
 include("includes/admin_pagefooter.php");

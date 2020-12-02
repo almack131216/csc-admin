@@ -7,7 +7,8 @@
 	$totaltime = ($finish - $start);
 	printf ("This page took %f seconds to load.", $totaltime);
 	*/
-	if($_SERVER['HTTP_HOST']=="localhost" || $_GET['debug']) echo '<p style="position:absolute;top:0px;left:0px;background:#f30;color:#fff;">'.$echo.'</p>';
+	if($debug) echo '<div style="position:fixed;bottom:0px;right:0px;background:#f30;color:#fff;">'.$debug.'</div>';
+	// if($_SERVER['HTTP_HOST']=="localhost" || $_GET['debug']) echo '<p style="position:absolute;top:0px;left:0px;background:#f30;color:#fff;">'.$echo.'</p>';
 ?>
 </div><!--(END OF): CONTENT -->
 </div><!--(END OF): WRAP ALL -->

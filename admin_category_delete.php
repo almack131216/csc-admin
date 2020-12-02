@@ -298,11 +298,11 @@ if(notloggedin()) {
 				$BuildItemRow .= '<span class="Actions">';
 				$BuildItemRow .= '<ul>';
 				if($thisList=="catalogue_cats"){
-					$my_price		= $ret_array['price'];
+					$my_price = $ret_array['price'];
 					$my_price_details = $ret_array['price_details'];
 					
-					$my_image_primary 	= $siteroot.$gp_uploadPath['primary'].$ret_array['image_large'];
-					$filename	 	= $ret_array['image_large'];
+					$my_image_primary = getImgDirSession('primary').$ret_array['image_large'];
+					$filename = $ret_array['image_large'];
 					
 					if($CMSShared->IsImage($filename)){
 						$myRolloverPreview = $my_image_primary;	

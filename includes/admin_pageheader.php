@@ -30,6 +30,7 @@ if(!$thickbox){
 			
 			$buildSpec='<p id="spec">'.$amactive['version'];//[01.01.08]			
 			if(!empty($cid)) $buildSpec.='<br>Logged in:&nbsp;'.$_SESSION['FirstName'].'&nbsp;'.$_SESSION['Surname'].'&nbsp;['.$cid.']';			
+			$buildSpec.='<br>SESSION IMG DIR: '.$_SESSION['ParentImgDir'];
 			
 			if( notloggedin() ) {			
 				if (substr($_SERVER['PHP_SELF'],-9) != 'index.php') { // if we aint on logout page already
@@ -49,7 +50,6 @@ if(!$thickbox){
 			
 			
 		echo '</div>';		
-		echo '<img src="layout/bg_header_icon.gif" class="CustomIcon">';
 		include("nav.php");
 		echo '<div id="content">';
 }	
