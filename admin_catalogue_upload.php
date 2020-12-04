@@ -336,9 +336,10 @@ if( notloggedin() ) {
 				// $image_dir = $tmpyear.'/'.$tmpmonth;
 				// $image_dir = $_SESSION['ParentImgDir'];
 				// $_SESSION['ParentImgDir'] = $image_dir;
-				$image_dir = GenerateImgDirName($TheDayToday);
-				$_SESSION['ParentImgDir'] = $image_dir;
-				$newImgDir = "../images/".$image_dir;
+				// $image_dir = GenerateImgDirName($TheDayToday);
+				// $_SESSION['ParentImgDir'] = $image_dir;
+				// $image_dir = $TheDayToday_image_dir;
+				$newImgDir = "../images/".$TheDayToday_image_dir;
 				checkFolderExists("",$newImgDir);
 				checkFolderExists("thumb",$newImgDir);
 				checkFolderExists("primary",$newImgDir);
@@ -378,13 +379,15 @@ if( notloggedin() ) {
 					for($i=0;$i<sizeof($FieldNames);$i++){
 						$query .= ", ${FieldNames[$i]}";
 					}
-					if($isAddParent) $query .= ",image_dir";
+					if($isAddParent){
+						$query .= ",date,image_dir";
+					}
 					$query .= ") VALUES ('$my_id_xtra','$UploadFileName'";//,'$UploadFileName'
 					for($i=0;$i<sizeof($FieldNames);$i++){
 						$query .= ", '${$FieldNames[$i]}'";
 					}
 					if($isAddParent){
-						$query .= ",'${$TheDayToday_image_dir}'";//2do
+						$query .= ",'".$TheDayToday."','".$TheDayToday_image_dir."'";//2do
 					}
 					$query .= ")";
 					echo $query;
