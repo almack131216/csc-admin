@@ -26,7 +26,7 @@ if($editid || $_REQUEST['id_xtra'] || ($_REQUEST['can'] || $_REQUEST['sid'])){
 
 	$debug .= '<p>[admin_catalogue_upload]</p>';
 	if($_REQUEST['id_xtra']){
-		$isAddAttachment = true;		
+		$isAddAttachment = true;	
 		$ParentID = $_REQUEST['id_xtra'];
 		$debug .= '>>>> 1 > Adding attachment... ('.$_REQUEST['id_xtra'].')';
 		$debug .= '<br>>>>> 1.2 > Adding attachment... FOLDER: (request: '.$_REQUEST['image_dir'].', session: '.$_SESSION['ParentImgDir'].')';
@@ -51,12 +51,13 @@ if($editid || $_REQUEST['id_xtra'] || ($_REQUEST['can'] || $_REQUEST['sid'])){
 		}elseif($editid && !$_REQUEST['sid']){
 			$debug .= '<br> 2.2';
 			$ParentID = $editid;
-			$query = "SELECT id,id_xtra,category,subcategory,image_dir FROM $db_clientTable_catalogue WHERE id=$editid";
+			$query = "SELECT id,id_xtra,category,subcategory,image_dir,date FROM $db_clientTable_catalogue WHERE id=$editid";
 			$result = mysql_query($query);
 			if($result){
 				$editidRow = mysql_fetch_array($result);
 				$cust_category=$editidRow['category'];
 				$cust_subcategory=$editidRow['subcategory'];
+				
 				if($editidRow['image_dir']){
 					// $_SESSION['ParentImgDir'] = $editidRow['image_dir'];
 					initImgDir($editidRow['image_dir']);
@@ -68,14 +69,16 @@ if($editid || $_REQUEST['id_xtra'] || ($_REQUEST['can'] || $_REQUEST['sid'])){
 				if(!empty($editidRow['id_xtra'])){
 					$isEditAttachment = true;
 					$ParentID = $editidRow['id_xtra'];
-					$q = "SELECT id,id_xtra,image_dir FROM $db_clientTable_catalogue WHERE id=$ParentID";
+					$q = "SELECT id,id_xtra,image_dir,date FROM $db_clientTable_catalogue WHERE id=$ParentID";
 					$r = mysql_query($q);
 					if($r){						
 						$ParentRow = mysql_fetch_array($r);
+						// $_SESSION['ParentDate'] = $ParentRow['date'];
 						initImgDir($ParentRow['image_dir']);
 						$debug .= '<br>SET PARENT DIR: '.$ParentRow['image_dir'];
 					}				
 				}else{
+					// $_SESSION['ParentDate'] = $editidRow['date'];
 					$isEditParent = true;
 				}
 			}
@@ -110,8 +113,7 @@ if($editid || $_REQUEST['id_xtra'] || ($_REQUEST['can'] || $_REQUEST['sid'])){
 	$my_ParentName = $tmpCatalogueData['itemNameRaw'];
 				
 }else{
-	$isAddParent = true;
-	$TheDayToday_image_dir = GenerateImgDirName($TheDayToday);
+	$isAddParent = true;	$TheDayToday_image_dir = GenerateImgDirName($TheDayToday);
 	initImgDir($TheDayToday_image_dir);
 	// $_SESSION['ParentImgDir'] = GenerateImgDirName($TheDayToday);
 	$BuildTitle = "Pages &#124; Add new item";
@@ -343,7 +345,8 @@ if( notloggedin() ) {
 				checkFolderExists("",$newImgDir);
 				checkFolderExists("thumb",$newImgDir);
 				checkFolderExists("primary",$newImgDir);
-				checkFolderExists("large",$newImgDir);				
+				checkFolderExists("large",$newImgDir);
+				checkFolderExists("highres",$newImgDir);				
 			}
 			
 			/// Publish Date
@@ -466,14 +469,16 @@ if( notloggedin() ) {
 							
 							////////////// Move the file over
 							$my_largeimage_withpath = getImgDirSession('large').$UploadFileName;
-							$my_highresimage_withpath = getImgDirSession('highres').$UploadFileName;				
+							$my_highresimage_withpath = getImgDirSession('highres').$UploadFileName;
+							$UploadedFile = $my_largeimage_withpath;
+							if($CMSMakeImages->HasHighRes()) $UploadedFile = $my_highresimage_withpath;
 							//echo '<br />(FB)FROM: '.$UploadFile.'<br />';//SHOW PATHS WHEN UPLOAD FAILS
 							//echo '<br />(FB)TO: '.$my_largeimage_withpath.'<br />';//SHOW PATHS WHEN UPLOAD FAILS
 							
 							// Make thumbnails, primary images and compress large image if necessary
 							if (
-							($ThinUpload==true && copy($UploadFile, $my_largeimage_withpath))
-							|| ($ThinUpload==false && move_uploaded_file($UploadFile,$my_largeimage_withpath))						
+							($ThinUpload==true && copy($UploadFile, $UploadedFile))
+							|| ($ThinUpload==false && move_uploaded_file($UploadFile,$UploadedFile))						
 							) { // (upload): if 3 ...move_uploaded_file()
 								//touch ( $my_largeimage_withpath, filemtime ( $UploadFile ) ); // set the file time to the new file
 								if($ThinUpload==true && $CMSShared->FileExists($UploadFile)) unlink($UploadFile); // REMOVE FILE FROM UPLOADS DIRECTORY
@@ -489,16 +494,17 @@ if( notloggedin() ) {
 									if($CMSShared->FileExists($my_image_highres)) unlink($my_image_highres);
 									
 									//echo '<br/>MAKE THUMB IMAGE:'.$my_largeimage_withpath.'/'.$UploadFileName;
-									$CMSMakeImages->MakeImage($my_largeimage_withpath,$UploadFileName,"thumb");
-									//if($isAddParent){
+									$CMSMakeImages->MakeImage($UploadedFile,$UploadFileName,"thumb");
+									if($isAddParent){
 										//echo '<br/>MAKE PRIMARY IMAGE:'.$my_largeimage_withpath.'/'.$UploadFileName;
-										$CMSMakeImages->MakeImage($my_largeimage_withpath,$UploadFileName,"primary");
-									//}
-									
-									$tmpDimensions = @getimagesize($my_largeimage_withpath);// get original (ACTUAL) dimensions								
-									if($ThinUpload==false && (filesize($my_largeimage_withpath)>$gp_maxfilesize_large || ($tmpDimensions[0]>$gp_large_width || $tmpDimensions[1]>$gp_large_height))){
+										$CMSMakeImages->MakeImage($UploadedFile,$UploadFileName,"primary");
+									}
+									$CMSMakeImages->MakeImage($UploadedFile,$UploadFileName,"large");
+
+									$tmpDimensions = @getimagesize($UploadedFile);// get original (ACTUAL) dimensions								
+									if($ThinUpload==false && (filesize($UploadedFile)>$gp_maxfilesize_large || ($tmpDimensions[0]>$gp_large_width || $tmpDimensions[1]>$gp_large_height))){
 										
-										$CMSMakeImages->MakeImage($my_largeimage_withpath,$UploadFileName,"large");
+										// $CMSMakeImages->MakeImage($UploadedFile,$UploadFileName,"large");
 										
 										// if(gp_enabled("highres")){										
 											$CMSMakeImages->MakeImage($my_highresimage_withpath,$UploadFileName,"highres");

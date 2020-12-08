@@ -298,17 +298,17 @@ function initImgDir($getDir){
 
 function switchDirName($getSize){
 	switch($getSize){
-		case 'thumbs':
-			return 'th';
-			break;
+		case 'highres':
+			return 'hi';
+			break;		
 		case 'large':
 			return 'lg';
 			break;
-		case 'highres':
-			return 'hi';
+		case 'thumbs':
+			return 'th';
 			break;
 		default:
-		return 'pr';		
+			return 'pr';		
 	}
 }
 
@@ -422,16 +422,21 @@ function checkFileExists( $getSize, $getFilename ){
     global $imgPath,$newDir,$filesMoved,$filesMovedTotal,$table;
 
     switch($getSize){
+		case "highres":
+			$imgPathLive = 'https://www.classicandsportscar.ltd.uk/images_catalogue/large/'.$getFilename;
+			$imgPathFrom = $imgPath.'highres/'.$getFilename;
+			$imgPathTo = $newDir.'/hi/'.$getFilename;
+			break;
+		case "large":
+			$imgPathLive = 'https://www.classicandsportscar.ltd.uk/images_catalogue/large/'.$getFilename;
+			$imgPathFrom = $imgPath.'large/'.$getFilename;
+			$imgPathTo = $newDir.'/lg/'.$getFilename;
+			break;
         case "thumb":
             $imgPathLive = 'https://www.classicandsportscar.ltd.uk/images_catalogue/thumbs/'.$getFilename;
             $imgPathFrom = $imgPath.'thumbs/'.$getFilename;
             $imgPathTo = $newDir.'/th/'.$getFilename;
-            break;
-        case "large":
-            $imgPathLive = 'https://www.classicandsportscar.ltd.uk/images_catalogue/large/'.$getFilename;
-            $imgPathFrom = $imgPath.'large/'.$getFilename;
-            $imgPathTo = $newDir.'/lg/'.$getFilename;
-            break;
+            break;		
         default:
             $imgPathLive = 'https://www.classicandsportscar.ltd.uk/images_catalogue/'.$getFilename;
             $imgPathFrom = $imgPath.$getFilename;
@@ -458,20 +463,22 @@ function checkFileExists( $getSize, $getFilename ){
 function returnLiveImage( $getSize, $getDir, $getFilename ){
     global $imgPath,$newDir,$filesMoved,$table;
 
-    $dirs = [];
-    $dirs['thumb'] = "thumbs/";
-    $dirs['primary'] = "";
-    $dirs['large'] = "large/";
+	$dirs = [];
+	$dirs['highres'] = "highres/";
+	$dirs['large'] = "large/";
+	$dirs['primary'] = "";
+	$dirs['thumb'] = "thumbs/";    
 
     switch($getDir){
         case "from":
             $switchDir = $imgPath;            
             break;
         case "to":
-            $switchDir = $newDir;
-            $dirs['thumb'] = "/th/";
+			$switchDir = $newDir;
+			$dirs['highres'] = "/hi/";
+			$dirs['large'] = "/lg/";            
             $dirs['primary'] = "/pr/";
-            $dirs['large'] = "/lg/";
+            $dirs['thumb'] = "/th/";
             break;
         case "live":
             $switchDir = 'https://www.classicandsportscar.ltd.uk/images_catalogue/';           

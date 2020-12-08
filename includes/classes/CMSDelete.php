@@ -30,11 +30,11 @@
 					}
 					$more_delete_result = $db->mysql_query_log($more_delete_query);
 					
-					// DELETE FILES ATTACHED					
-					$more_image_thumb = getImgDir($getImageDir,'thumbs').$more_file;
-					$more_image = getImgDir($getImageDir,'primary').$more_file;
-					$more_image_large = getImgDir($getImageDir,'large').$more_file;
+					// DELETE FILES ATTACHED		
 					$more_image_highres = getImgDir($getImageDir,'highres').$more_file;
+					$more_image_large = getImgDir($getImageDir,'large').$more_file;
+					$more_image = getImgDir($getImageDir,'primary').$more_file;		
+					$more_image_thumb = getImgDir($getImageDir,'thumbs').$more_file;					
 					$more_CustomThumb = getImgDir($getImageDir,'thumbs').$more_file_small;
 
 					$debug .= '<br>!!! DELETE ITEM ('.$more_id.') !!!';

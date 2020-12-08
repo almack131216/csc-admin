@@ -43,9 +43,11 @@
 		$my_price = $edit_arr['price'];
 		$my_price2 = $edit_arr['price2'];
 		$my_price_details = $edit_arr['price_details'];
-		if(!$my_id_xtra){
+		if(!$my_id_xtra){			
+			$_SESSION['ParentDate'] = $edit_arr['date'];
 			$my_image_dir = $edit_arr['image_dir'];
 			initImgDir($my_image_dir);
+			$debug .= '<br>[admin_catalogue_item_data] SESS ParentDate: '.$_SESSION['ParentDate'].', date: '.$edit_arr['date'];
 		}
 		$debug .= '<br>[admin_catalogue_item_data] id: '.$my_id.', id_xtra: '.$my_id_xtra;
 		
@@ -112,6 +114,7 @@
 		$my_month = date(m);
 		$my_year = date(Y);
 		$my_image_dir = GenerateImgDirName($TheDayToday);
+		// $_SESSION['ParentDate'] = $TheDayToday;
 		
 		$my_day_spare = '00';
 		$my_month_spare = '00';

@@ -53,6 +53,7 @@
 					if(!empty($more_array['image_dir']) && $more_array['id_xtra']==0 && $more_array['image_dir']!=$_SESSION['ParentImgDir']){
 						initImgDir($more_array['image_dir']);
 					}
+					$my_image_highres = getImgDirSession('highres').$more_array['image_large'];
 					$my_image_large = getImgDirSession('large').$more_array['image_large'];
 					$my_image_thumb = getImgDirSession('thumbs').$more_array['image_large'];
 					$more_filename = $more_array['image_large'];
@@ -148,7 +149,7 @@
 	//hidden fields
 	if($my_id_xtra) $BuildForm.= '<input type="hidden" name="id_xtra" value='.$my_id_xtra.'>';
 	if($editid) $BuildForm.= '<input type="hidden" name="editid" value="'.$editid.'">';
-	// if($my_image_dir) $BuildForm.= '<input type="hidden" name="image_dir" value="'.$my_image_dir.'">';
+	// if($isAddParent) $BuildForm.= '<input type="text" name="isAddParent" value="true">';
 	$BuildForm.= '<input type="hidden" name="updater" value="'.$updated.'">';
 		
 	// stepnum needs to be a variable as some features will be hidden when uploading to existing item(additional images)
@@ -461,6 +462,7 @@
 			///  ITEM PUBLISH DATE								
 			$BuildForm.= '<div class="panel_oneline">';
 			$BuildForm.= '<input type="text" name="image_dir" value="'.$_SESSION['ParentImgDir'].'" readonly>';
+			$BuildForm.= '<input type="text" name="ParentDate" value="'.$_SESSION['ParentDate'].'" readonly>';
 			$BuildForm.= '<p><span class="steptitle">Step '.$stepnum.':</span> Publish date';
 			$BuildForm.= '<div class="inner_right">';
 			

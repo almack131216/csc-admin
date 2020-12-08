@@ -96,16 +96,15 @@
 			
 			$type = $CMSShared->GetFileType($filename);			
 			
-			$loc_thumbs = getImgDirSession('thumbs');
-			$loc_primary = getImgDirSession('primary');
 			$loc_highres = getImgDirSession('highres');
-			$loc_large = getImgDirSession('large');
+			$loc_large = getImgDirSession('large');			
+			$loc_primary = getImgDirSession('primary');
+			$loc_thumbs = getImgDirSession('thumbs');
 			$debug .= '<br>?????????????????'.$loc_large;	
 			
 			if ($quality != 100){		
 				
-				if ($type != "gif" ) {
-					
+				if ($type != "gif" ) {					
 					if ( $type=="jpeg" || $type=="jpg" ) {
 						$CMSMakeImages->ThumbMe("jpg", $filename, $width_new, $height_new, $quality, $size);					
 					} elseif($type="png" || $type="PNG") {
@@ -147,13 +146,16 @@
 		////////////////////////////////////////////////////////////
 		////////////////////////// 	 MAKE THUMBNAIL IMAGE  /////////
 		function ThumbMe($format, $image_name, $width_new, $height_new, $quality, $size){
-			global $siteroot;
+			global $siteroot,$debug,$TheDayToday;
 			global $CMSMakeImages;
 			
 			$loc_highres = getImgDirSession('highres');
 			$loc_large = getImgDirSession('large');
 			$loc_primary = getImgDirSession('primary');
 			$loc_thumbs = getImgDirSession('thumbs');
+
+			$UploadedFileDir = $loc_large;
+			if($CMSMakeImages->HasHighRes()) $UploadedFileDir = $loc_highres;
 			
 			if($size == "thumb"){
 				$loc_dynamic = $loc_thumbs;
@@ -175,22 +177,25 @@
 			///////////// MAKE JPEG THUMBNAIL
 			switch($format) {
 				case "jpg":
-					$srcimg=ImageCreateFromJPEG($loc_large.$image_name) or die("problem opening source image $loc_large > $image_name");	
+					$debug .= '<br>$loc_large: '.$loc_large;
+					$debug .= '<br>$image_name: '.$image_name;
+					echo $debug;
+					$srcimg=ImageCreateFromJPEG($UploadedFileDir.$image_name) or die("problem opening source image $UploadedFileDir > $image_name");	
 					ImageCopyResized($destimg,$srcimg,0,0,0,0,$width_new,$height_new,ImageSX($srcimg),ImageSY($srcimg) ) or die("Problem in resizing");	
 					//ImageJPEG($destimg,$loc_dynamic.$image_name, $quality) or die("Problem in saving");
-					$CMSMakeImages->MakeImage_MergeCenter($loc_large.$image_name, $loc_dynamic.$image_name, $width_new, $height_new);
+					$CMSMakeImages->MakeImage_MergeCenter($UploadedFileDir.$image_name, $loc_dynamic.$image_name, $width_new, $height_new);
 					break;			
 					
 					///////////// MAKE PNG THUMBNAIL
 				case "png":
-					$srcimg=ImageCreateFromPNG($loc_large.$image_name) or die("problem opening source image $loc_large $image_name ");	
+					$srcimg=ImageCreateFromPNG($UploadedFileDir.$image_name) or die("problem opening source image $UploadedFileDir $image_name ");	
 					ImageCopyResized($destimg,$srcimg,0,0,0,0,$width_new,$height_new,ImageSX($srcimg),ImageSY($srcimg) ) or die("Problem in resizing");	
 					ImagePNG($destimg,$loc_dynamic.$image_name, $quality) or die("Problem in saving");
 					break;
 					
 					///////////// MAKE PNG THUMBNAIL
 				case "gif":
-					$srcimg=ImageCreateFromGIF($loc_large.$image_name) or die("problem opening source image $loc_large $image_name ");	
+					$srcimg=ImageCreateFromGIF($UploadedFileDir.$image_name) or die("problem opening source image $UploadedFileDir $image_name ");	
 					ImageCopyResized($destimg,$srcimg,0,0,0,0,$width_new,$height_new,ImageSX($srcimg),ImageSY($srcimg) ) or die("Problem in resizing");	
 					ImageGIF($destimg,$loc_dynamic.$image_name) or die("Problem in saving");
 					break;
@@ -286,7 +291,10 @@
 			}
 		}
 
-
+		function HasHighRes(){
+			if($_SESSION['ParentDate'] >= '2020-12-08') return true;
+			return false;
+		}
 	}
 	$CMSMakeImages = new CMSMakeImages();
 
