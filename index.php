@@ -101,7 +101,7 @@ $query = "SELECT * FROM $db_client.users WHERE username='$u' AND password='$p' L
 		$_SESSION['website']		= $row['website'];
 		$_SESSION['username']		= $row['username'];
 		$_SESSION['password']		= $row['password'];			
-		$_SESSION['adminroot']		= "http://".$_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/";
+		$_SESSION['adminroot']		= "https://".$_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/";
 		
 		if(!empty($row['siteroot'])){//ServerSpecific
 			$_SESSION['siteroot']		= $row['siteroot'];

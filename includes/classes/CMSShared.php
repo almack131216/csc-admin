@@ -26,7 +26,7 @@
 		//////////////////////////////////
 		/// Show absolute URL of this page
 		function PageURL(){
-			return urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+			return urlencode('https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
 		}
 		/// END ///
 		

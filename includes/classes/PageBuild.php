@@ -56,8 +56,8 @@
 			global $adminroot;
 			
 			$MetaTags = '';
-			$MetaTags .= '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'."\r\n";
-			$MetaTags .= '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">'."\r\n";
+			$MetaTags .= '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'."\r\n";
+			$MetaTags .= '<html xmlns="https://www.w3.org/1999/xhtml" xml:lang="en" lang="en">'."\r\n";
 			$MetaTags .= '<head>'."\r\n";
 			$MetaTags .= '<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />';
 			$MetaTags .= '<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />'."\r\n";			
@@ -137,7 +137,7 @@
 		
 		////////////////////////
 		/// third-party Lightbox / Thickbox
-		/// from; http://jquery.com/demo/thickbox/
+		/// from; https://jquery.com/demo/thickbox/
 		function AddThickbox(){
 			global $adminroot;			
 			$Thickbox = '<script type="text/javascript" src="'.$adminroot.'includes/thickbox/jquery-1.2.3.min.js"></script>'."\r\n";
@@ -157,8 +157,8 @@
 			switch($_SERVER['HTTP_HOST']){//ServerSpecific
 				case "localhost":				$gKey = "ABQIAAAAvVBk7xOgEj-MJaaECzD0kBRnXyL79Gf8PwjJPly3ZDbFQrWQLBQiG8OrhcBJnElDAuam5Ek3HdD7qQ";break;
 			}
-			$GoogleMapTags .= '<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key='.$gKey.'" type="text/javascript"></script>';
-			$GoogleMapTags .= '<script src="http://www.google.com/uds/api?file=uds.js&v=1.0&key='.$gKey.'" type="text/javascript"></script>';
+			$GoogleMapTags .= '<script src="https://maps.google.com/maps?file=api&amp;v=2&amp;key='.$gKey.'" type="text/javascript"></script>';
+			$GoogleMapTags .= '<script src="https://www.google.com/uds/api?file=uds.js&v=1.0&key='.$gKey.'" type="text/javascript"></script>';
 			$GoogleMapTags .= '<script type="text/javascript" src="'.$adminroot.'includes/js/gmap.js"></script>'."\r\n";
 	
 			return $GoogleMapTags;

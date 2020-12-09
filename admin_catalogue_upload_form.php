@@ -598,7 +598,7 @@
 			
 			if($suid ||gp_enabled("BrowseUpload")){
 				$JumpToPage = $_SERVER['PHP_SELF'].'?UploadFileSkipped=true&category='.$my_cat.'&subcategory='.$_GET['subcategory'];
-				if(!empty($_REQUEST['subcategory'])) header ("Location: http://" . $_SERVER['HTTP_HOST'].$JumpToPage);
+				if(!empty($_REQUEST['subcategory'])) header ("Location: https://" . $_SERVER['HTTP_HOST'].$JumpToPage);
 				/*$BuildForm.= '<div class="panel_oneline">';
 					$BuildForm.= '<p><span class="steptitle">Step '.$stepnum.':</span> Continue...';
 					$BuildForm.= '<div class="inner_right">';

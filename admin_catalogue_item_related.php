@@ -43,7 +43,7 @@ if( notloggedin() ) {
 			if($_POST['category_new'] && $_POST['subcategory_new']){
 				$InsertQuery = "INSERT INTO $db_client.$tablename (id,itemID,categoryID,subcategoryID) VALUES (0,$editid,".$_POST['category_new'].",".$_POST['subcategory_new'].")";
 				$InsertResult = $db->mysql_query_log($InsertQuery);
-				header("Location: http://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?success=true&editid=".$editid);
+				header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?success=true&editid=".$editid);
 			}else{
 				echo '<p class="error">Please select category and subcategory to add to related information</p>';
 			}
@@ -55,7 +55,7 @@ if( notloggedin() ) {
 			
 			$UpdateQuery = "UPDATE $db_client.$tablename SET categoryID=${_POST[$FieldName2]}, subcategoryID=${_POST[$FieldName3]} WHERE id=${_POST[$FieldName1]} LIMIT 1";
 			$UpdateResult = $db->mysql_query_log($UpdateQuery);
-			if($UpdateResult && mysql_affected_rows()) header("Location: http://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?success=true&editid=".$editid);
+			if($UpdateResult && mysql_affected_rows()) header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?success=true&editid=".$editid);
 		}*/	
 	//}
 	
@@ -64,7 +64,7 @@ if( notloggedin() ) {
 			if($_POST['rd_subcategory_new'] && $_POST['document_new']){
 				$InsertQuery = "INSERT INTO $db_client.$tablename (id,itemID,itemID2) VALUES (0,$editid,".$_POST['document_new'].")";
 				$InsertResult = $db->mysql_query_log($InsertQuery);
-				header("Location: http://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?success=true&editid=".$editid);
+				header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?success=true&editid=".$editid);
 			}else{
 				echo '<p class="error">Please select subcategory and document to add to related documents</p>';
 			}
@@ -81,14 +81,14 @@ if( notloggedin() ) {
 			if($_POST[$FieldName1] && ($_POST[$FieldName2] || $_POST[$FieldName3]) ){
 				$UpdateQuery = "UPDATE $db_client.$tablename SET categoryID=".$_POST[$FieldName2].", subcategoryID=".$_POST[$FieldName3]." WHERE id=".$_POST[$FieldName1]." LIMIT 1";
 				$UpdateResult = $db->mysql_query_log($UpdateQuery);
-				if($UpdateResult && mysql_affected_rows()) header("Location: http://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?success=true&editid=".$editid);
+				if($UpdateResult && mysql_affected_rows()) header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?success=true&editid=".$editid);
 			}
 			
 			//Update related DOCUMENTS
 			if($_POST[$FieldName1] && ($_POST[$FieldName4] || $_POST[$FieldName5]) ){
 				$UpdateQuery = "UPDATE $db_client.$tablename SET subcategoryID=".$_POST[$FieldName4].", itemID2=".$_POST[$FieldName5]." WHERE id=".$_POST[$FieldName1]." LIMIT 1";
 				$UpdateResult = $db->mysql_query_log($UpdateQuery);
-				if($UpdateResult && mysql_affected_rows()) header("Location: http://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?success=true&editid=".$editid);
+				if($UpdateResult && mysql_affected_rows()) header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?success=true&editid=".$editid);
 			}
 		}		
 		

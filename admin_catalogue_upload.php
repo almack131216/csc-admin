@@ -46,7 +46,7 @@ if($editid || $_REQUEST['id_xtra'] || ($_REQUEST['can'] || $_REQUEST['sid'])){
 			$result = mysql_query($query);
 			if($result && mysql_num_rows($result)==1){
 				$staffRow = mysql_fetch_array($result);
-				header("Location: http://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?jumped=true&editid=".$staffRow['id']);
+				header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?jumped=true&editid=".$staffRow['id']);
 			}
 		}elseif($editid && !$_REQUEST['sid']){
 			$debug .= '<br> 2.2';
@@ -604,7 +604,7 @@ if( notloggedin() ) {
 					$ParentID = $my_id_xtra;
 				}
 				//echo "UploadFileName = ".$UploadFileName;
-				header("Location: http://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?success=true&editid=".$uid."&oldName=".$oldName);
+				header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?success=true&editid=".$uid."&oldName=".$oldName);
 			}else{
 				/*
 				if($CMSShared->FileExists($my_largeimage_withpath) && $my_filename != ''){

@@ -323,7 +323,7 @@
 					$tmpAddress.=$row[$field_postcode].' <a href="javascript:OpenClose(\'GetDirections\');" title="Get directions to this location">[directions]</a><br>';
 
 					$tmpAddress.='<div id="GetDirections" style="display:none;">';
-					$tmpAddress.='<form action="http://maps.google.co.uk/maps" method="get" target="_blank">';
+					$tmpAddress.='<form action="https://maps.google.co.uk/maps" method="get" target="_blank">';
 					$tmpAddress.='<label for="saddr">Enter your postcode and hit GO!</label><br>';
 					$tmpAddress.='<input type="text" name="saddr" id="saddr" value="" />';
 					$tmpAddress.='<input type="submit" value="GO!" class="gmapGo" />';
