@@ -269,6 +269,11 @@ function show_contact_admin() {
 
 // 201129
 
+function imgDirsReset(){
+	$_SESSION['ParentImgDir'] = '';
+	$_SESSION['ParentDate'] = '';
+}
+
 function GenerateImgDirName($getDate){
 	global $TheDayToday,$debug;
 
@@ -279,20 +284,47 @@ function GenerateImgDirName($getDate){
 	return $newDirStr;
 }
 
-function initImgDir($getDir){
+function initImgDir($getDir,$getDate){
 	global $TheDayToday,$debug;
 
 	$debug .= '<p>!!!!!!!!!!!!!!!!!!!!!';
-	$debug .= '<br>!!! initImgDir !!!';
-	if(!$_SESSION['ParentImgDir']){
-		$_SESSION['ParentImgDir'] = GenerateImgDirName($TheDayToday);
-		$debug .= '<br>!!! initImgDir: $_SESSION[ParentImgDir] SET (TODAY): '.$_SESSION['ParentImgDir'];
-	}elseif($_SESSION['ParentImgDir'] && $getDir != $_SESSION['ParentImgDir']){
-		$_SESSION['ParentImgDir'] = $getDir;
-		$debug .= '<br>!!! initImgDir: $_SESSION[ParentImgDir] CHANGE: '.$_SESSION['ParentImgDir'];
-	}elseif($_SESSION['ParentImgDir'] && $getDir == $_SESSION['ParentImgDir']){
-		$debug .= '<br>!!! initImgDir: $_SESSION[ParentImgDir] NO CHANGE: '.$getDir.' ('.$_SESSION['ParentImgDir'].')';
+	$debug .= '<br>!!! initImgDir !!! dir: '.$getDir.' > date: '.$getDate;
+
+	if($getDate){
+		$_SESSION['ParentDate'] = $getDate;
+		if($getDir){
+			$_SESSION['ParentImgDir'] = $getDir;
+		}else{
+			if($getDate >= '2020-12-08'){
+				$_SESSION['ParentImgDir'] = GenerateImgDirName($getDate);
+			}else{
+				$_SESSION['ParentImgDir'] = '';
+			}
+		}
+	}else{
+		if(!$getDir){
+			$_SESSION['ParentDate'] = $TheDayToday;
+			$_SESSION['ParentImgDir'] = GenerateImgDirName($TheDayToday);
+		}		
 	}
+	// if($getDate && $getDate >= '2020-12-08'){
+	// 	$_SESSION['ParentDate'] = $getDate;
+
+	// 	if($getDir){
+	// 		$_SESSION['ParentImgDir'] = $getDir;
+	// 	}
+	// }elseif($getDate && $getDate < '2020-12-08'){
+	// 	$getDate >= '2020-12-08'
+	// }
+	// if(!$_SESSION['ParentImgDir'] && !$getDate){
+	// 	$_SESSION['ParentImgDir'] = GenerateImgDirName($TheDayToday);
+	// 	$debug .= '<br>!!! initImgDir: $_SESSION[ParentImgDir] SET (TODAY): '.$_SESSION['ParentImgDir'];
+	// }elseif($_SESSION['ParentImgDir'] && $getDir != $_SESSION['ParentImgDir']){
+	// 	$_SESSION['ParentImgDir'] = $getDir;
+	// 	$debug .= '<br>!!! initImgDir: $_SESSION[ParentImgDir] CHANGE: '.$_SESSION['ParentImgDir'];
+	// }elseif($_SESSION['ParentImgDir'] && $getDir == $_SESSION['ParentImgDir']){
+	// 	$debug .= '<br>!!! initImgDir: $_SESSION[ParentImgDir] NO CHANGE: '.$getDir.' ('.$_SESSION['ParentImgDir'].')';
+	// }
 	$debug .= '<br>!!!!!!!!!!!!!!!!!!!!!</br>';
 }
 
@@ -382,12 +414,15 @@ function isAttachment($getIdXtra){
 
 function returnToDir($getSize){
     switch($getSize){
+		case "highres":
+            $getSize = '/hi/';
+			break;
+		case "large":
+			$getSize = '/lg/';
+			break;
         case "thumb":
             $getSize = '/th/';
-            break;
-        case "large":
-            $getSize = '/lg/';
-            break;
+            break;        
         default:
             $getSize = '/pr/';
     }

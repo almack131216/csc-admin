@@ -41,7 +41,7 @@ if (!empty($_REQUEST['uid'])) {
 		$my_image_dir = $ret_array['image_dir'];
 		$my_filename = $ret_array['image_large'];
 		$debug .= '<br>image_dir: '.$my_image_dir;
-		// initImgDir($my_image_dir);
+
 		$my_image_highres = getImgDir($my_image_dir,'highres').$my_filename;
 		$my_image_large = getImgDir($my_image_dir,'large').$my_filename;
 		$my_image_primary = getImgDir($my_image_dir,'primary').$my_filename;

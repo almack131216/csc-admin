@@ -1,4 +1,7 @@
 <?php
+	ini_set('display_errors', 1);
+	// ini_set('display_startup_errors', 1);
+	// error_reporting(E_ALL);
 
 	$BuildPage = '';
 	
@@ -38,7 +41,7 @@
 	//require_once('classes/PageBuild.php');
 	//require_once("prefs/catalogue_prefs.php");
 	require_once('includes/functions.php');
-	
+	// imgDirsReset();
 	////////////////////////////////////////////
 	///    COLORS     //////    BLUES  /////////
 	$colors = array("darkest" => '#336699', "dark" => '#6699CC', "medium" => '#cccccc', "light" => '#f3f3f3', "lightest" => '#ffffff');

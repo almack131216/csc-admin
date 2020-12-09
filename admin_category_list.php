@@ -52,6 +52,8 @@ $BuildPage .= $PageBuild->AddTag('ImageTrail_tooltip.js');
 $BuildPage .= $PageBuild->AddTag('ImageTrail_ajax.js');
 include("includes/admin_pageheader.php");
 include("includes/classes/CMSHelp.php");
+
+imgDirsReset();
 //init_thisList();
 
 /////////// check to see if session is set

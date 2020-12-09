@@ -51,7 +51,7 @@
 					//$more_my_cat = $more_array['category'];
 					$more_my_name = $more_array['name'];
 					if(!empty($more_array['image_dir']) && $more_array['id_xtra']==0 && $more_array['image_dir']!=$_SESSION['ParentImgDir']){
-						initImgDir($more_array['image_dir']);
+						initImgDir($more_array['image_dir'],$more_array['date']);
 					}
 					$my_image_highres = getImgDirSession('highres').$more_array['image_large'];
 					$my_image_large = getImgDirSession('large').$more_array['image_large'];

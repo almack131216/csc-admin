@@ -31,6 +31,8 @@ if($cust_category && $cust_subcategory) $BuildTip .= ' within <a href="admin_cat
 if(!$cust_category) $BuildTip .= " in your database. Use the drop-downs to fine-tune the range of items listed below";
 if($suid) $BuildTip = "Please select one of your entries to edit details";
 
+imgDirsReset();
+
 if($tmpCatalogueData['count']==0){
 	if($cust_category) $NoItems = '<p class="prompt">There are currently no '.$CommonCustomWords['item'].'s to view in '.$tmpCatalogueData['categoryLink'];
 	if($cust_category && $cust_subcategory) $NoItems .= ' &gt; '.$tmpCatalogueData['subcategoryName'];

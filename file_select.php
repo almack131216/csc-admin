@@ -28,7 +28,7 @@ if(isset($_GET['id_xtra'])){
 }
 if(isset($_GET['image_dir'])){
 	$my_image_dir = $_GET['image_dir'];
-	initImgDir($my_image_dir);
+	initImgDir($my_image_dir,'');
 }
 
 

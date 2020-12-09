@@ -60,9 +60,10 @@ if($editid || $_REQUEST['id_xtra'] || ($_REQUEST['can'] || $_REQUEST['sid'])){
 				
 				if($editidRow['image_dir']){
 					// $_SESSION['ParentImgDir'] = $editidRow['image_dir'];
-					initImgDir($editidRow['image_dir']);
+					initImgDir($editidRow['image_dir'],$editidRow['date']);
 				}else{
-					$_SESSION['ParentImgDir'] = '';
+					// $_SESSION['ParentImgDir'] = '';
+					// $_SESSION['ParentDate'] = '';
 				}
 				
 				$debug .= '<br>>>>> 2.3 >> category: '.$cust_category;
@@ -74,11 +75,10 @@ if($editid || $_REQUEST['id_xtra'] || ($_REQUEST['can'] || $_REQUEST['sid'])){
 					if($r){						
 						$ParentRow = mysql_fetch_array($r);
 						// $_SESSION['ParentDate'] = $ParentRow['date'];
-						initImgDir($ParentRow['image_dir']);
+						initImgDir($ParentRow['image_dir'],$ParentRow['date']);
 						$debug .= '<br>SET PARENT DIR: '.$ParentRow['image_dir'];
 					}				
 				}else{
-					// $_SESSION['ParentDate'] = $editidRow['date'];
 					$isEditParent = true;
 				}
 			}
@@ -113,8 +113,9 @@ if($editid || $_REQUEST['id_xtra'] || ($_REQUEST['can'] || $_REQUEST['sid'])){
 	$my_ParentName = $tmpCatalogueData['itemNameRaw'];
 				
 }else{
-	$isAddParent = true;	$TheDayToday_image_dir = GenerateImgDirName($TheDayToday);
-	initImgDir($TheDayToday_image_dir);
+	$isAddParent = true;
+	// $TheDayToday_image_dir = GenerateImgDirName($TheDayToday);
+	initImgDir('','');
 	// $_SESSION['ParentImgDir'] = GenerateImgDirName($TheDayToday);
 	$BuildTitle = "Pages &#124; Add new item";
 	$BuildTip = "Add to your catalogue using the form below";
@@ -278,7 +279,7 @@ if( notloggedin() ) {
 			//////////////////////
 			/// image_dir
 			if ($isAddParent && isset($_POST['image_dir']) ) {		
-				initImgDir($_POST['image_dir']);										
+				initImgDir('','');										
 			}			
 				
 			//////////////////////
