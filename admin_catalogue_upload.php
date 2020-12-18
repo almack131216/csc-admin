@@ -114,7 +114,7 @@ if($editid || $_REQUEST['id_xtra'] || ($_REQUEST['can'] || $_REQUEST['sid'])){
 				
 }else{
 	$isAddParent = true;
-	// $TheDayToday_image_dir = GenerateImgDirName($TheDayToday);
+	$TheDayToday_image_dir = GenerateImgDirName($TheDayToday);
 	initImgDir('','');
 	// $_SESSION['ParentImgDir'] = GenerateImgDirName($TheDayToday);
 	$BuildTitle = "Pages &#124; Add new item";
