@@ -95,13 +95,13 @@ $query = "SELECT * FROM $db_client.users WHERE username='$u' AND password='$p' L
 		$row = mysql_fetch_array($result);
 		// start the session, register values and redirect
 		if(!$_SESSION['FirstName']) $_SESSION['FirstName']		= $row['FirstName'];
-		if(!$_SESSION['Surname'])	$_SESSION['Surname']		= $row['Surname'];
-		$_SESSION['cid']			= $row['cid'];
-		$_SESSION['quickname']		= $row['quickname'];
-		$_SESSION['website']		= $row['website'];
-		$_SESSION['username']		= $row['username'];
-		$_SESSION['password']		= $row['password'];			
-		$_SESSION['adminroot']		= "https://".$_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/";
+		if(!$_SESSION['Surname']) $_SESSION['Surname']		= $row['Surname'];
+		$_SESSION['cid'] = $row['cid'];
+		$_SESSION['quickname'] = $row['quickname'];
+		$_SESSION['website'] = $row['website'];
+		$_SESSION['username'] = $row['username'];
+		$_SESSION['password'] = $row['password'];			
+		$_SESSION['adminroot'] = $host.dirname($_SERVER['PHP_SELF'])."/";
 		
 		if(!empty($row['siteroot'])){//ServerSpecific
 			$_SESSION['siteroot']		= $row['siteroot'];

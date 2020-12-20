@@ -29,7 +29,7 @@ if(!$thickbox){
 		echo '<div id="header">';			
 			
 			$buildSpec='<p id="spec">'.$amactive['version'];//[01.01.08]			
-			if(!empty($cid)) $buildSpec.='<br>Logged in:&nbsp;'.$_SESSION['FirstName'].'&nbsp;'.$_SESSION['Surname'].'&nbsp;['.$cid.']';			
+			if(!empty($cid)) $buildSpec.=' | Logged in:&nbsp;'.$_SESSION['FirstName'].'&nbsp;'.$_SESSION['Surname'].'&nbsp;['.$cid.']';			
 			$buildSpec.='<br>SESS ParentImgDir: '.$_SESSION['ParentImgDir'];
 			$buildSpec.='<br>SESS ParentDate: '.$_SESSION['ParentDate'];
 			

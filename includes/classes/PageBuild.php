@@ -4,6 +4,7 @@
 	// error_reporting(E_ALL);
 
 	$BuildPage = '';
+	$host = "http://".$_SERVER['HTTP_HOST'];
 	
 	// start output buffering and initialise a session
 	ob_start();
@@ -18,14 +19,15 @@
 	// check for page_title value(set if not already)
 	if (!$page_title) $page_title = '(ADMIN) LOG-IN';
 	if($_SESSION['db_client']){
-		$adminDir		= "admin";
-		$adminroot		= $_SESSION['adminroot'];
-		$siteroot		= $_SESSION['siteroot'];
-		$cid			= $_SESSION['cid'];
-		$cid_QuickName	= $_SESSION['quickname'];
-		$cid_Website	= $_SESSION['website'];
-		$db_client		= $_SESSION['db_client'];
+		$adminDir = "admin";		
+		$adminroot = $_SESSION['adminroot'];
+		$siteroot = $_SESSION['siteroot'];
+		$cid = $_SESSION['cid'];
+		$cid_QuickName = $_SESSION['quickname'];
+		$cid_Website = $_SESSION['website'];
+		$db_client = $_SESSION['db_client'];
 	}
+	// echo '<br>adminroot: '.$adminroot;
 	//echo '<br/>(pageheader) _SESSION[adminroot]:'.$adminroot;
 	//echo '<br/>(pageheader) _SESSION[siteroot]:'.$siteroot;
 	//echo '<br/>(pageheader) _SESSION[db_client]:'.$db_client;

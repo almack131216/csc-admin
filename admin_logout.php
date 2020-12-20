@@ -7,7 +7,7 @@ include("includes/admin_pageheader.php");
 
 if (!isset($_SESSION['FirstName'])) {
 	//Link To Marks' Prodadmin
-	header ("Location: https://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/index.php?client=".$_GET['client']);
+	header ("Location: ".$host.dirname($_SERVER['PHP_SELF'])."/index.php?client=".$_GET['client']);
 	ob_end_clean();
 	exit();
 } else {
