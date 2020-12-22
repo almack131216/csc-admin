@@ -175,7 +175,12 @@ function get_category($ret_catnum,$value,$ret_thisList){
 						
 						
 		case "stock_value":
-						$query_cat	= "SELECT * FROM $tablename_items WHERE status=1 AND $table_fieldname=$ret_catnum";
+						$status = 1;
+						if($ret_catnum==999){
+							$status = 2;
+							$ret_catnum = 2;
+						}
+						$query_cat	= "SELECT * FROM $tablename_items WHERE status=$status AND $table_fieldname=$ret_catnum";
 						$result_cat	= mysql_query($query_cat);						
 						$numrows = mysql_num_rows($result_cat);
 						$stock_value = 0;

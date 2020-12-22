@@ -20,8 +20,6 @@ function init_thisList(){
 	}
 }
 
-
-
 init_thisList();
 include("includes/classes/PageBuild.php");
 $BuildPage .= $PageBuild->AddPageTitle($page_title);
@@ -32,8 +30,8 @@ $BuildPage .= $PageBuild->AddTag('JumpForms.js');
 $BuildPage .= $PageBuild->AddTag('mootools.css');
 $BuildPage .= $PageBuild->AddTag(array('dir'=>'addingajax/','file'=>'addingajax.js'));
 // third-party Image Rollover (ajax)
-$BuildPage .= $PageBuild->AddTag('ImageTrail_tooltip.js');
-$BuildPage .= $PageBuild->AddTag('ImageTrail_ajax.js');
+// $BuildPage .= $PageBuild->AddTag('ImageTrail_tooltip.js');
+// $BuildPage .= $PageBuild->AddTag('ImageTrail_ajax.js');
 include("includes/admin_pageheader.php");
 include("includes/classes/CMSHelp.php");
 
@@ -43,8 +41,11 @@ imgDirsReset();
 /////////// check to see if session is set
 if( notloggedin()) {
 	include('includes/admin_notloggedin.html');
-} else {	
-	$fieldname="category";
+} else {
+	$categoryForSale = 2;
+	$categorySold = 999;
+	$categoryPlates = 6;
+
 	$q = "SELECT cc.id AS categoryId,cc.category AS categoryName FROM stemmvog_csc2.catalogue_cats AS cc ORDER BY cc.position ASC";
 	$q = "SELECT cc.position,cc.id AS categoryId,cc.category AS categoryName FROM stemmvog_csc2.catalogue_cats AS cc UNION ALL SELECT cc2.position,cc2.id AS categoryId,cc2.category AS categoryName FROM stemmvog_csc2.catalogue_cats AS cc2 WHERE cc2.id=2 ORDER BY position ASC";
 	$r = mysql_query($q);
@@ -52,9 +53,8 @@ if( notloggedin()) {
 	$catArr = [];
 
 	if($r && mysql_num_rows($r)>1){
-		$getcats_numrows = mysql_num_rows($r);
-		$tmp_numrows = $getcats_numrows;
-	
+		$ccNumRows = mysql_num_rows($r);
+		$tmp_numrows = $ccNumRows;	
 		$my_price_total = 0;
 		
 		$DataBuild = '';
@@ -65,43 +65,42 @@ if( notloggedin()) {
 			$DataBuild .= '<li>';			
 			if(gp_enabled("price")) $DataBuild .= '<span class="Price">&pound;Stock</span>';
 			//$DataBuild .= '<span class="Status">Status</span>';
-				$DataBuild .= '<span class="Category">Categories</span>';
-				$DataBuild .= '<span class="Name">Sub-Categories</span>';
+			$DataBuild .= '<span class="Category">Categories</span>';
+			$DataBuild .= '<span class="Name">Sub-Categories</span>';
 
 			$DataBuild .= '<span class="Category">Items in Category</span>';
 			$DataBuild .= '<span class="Actions">Actions</span>';
 			$DataBuild .= '</li>';
 		$DataBuild .= '</ul>';
 
-			$DataBuild .= '<ul class="sortable-list">';
+		$DataBuild .= '<ul class="sortable-list">';
 		
-		for($i=1;$i<=$getcats_numrows;$i++){
-
-			$getcats_row = mysql_fetch_array($r);
-			$categoryId = $getcats_row['categoryId'];
-			$categoryName = $getcats_row['categoryName'];
+		for($i=1;$i<=$ccNumRows;$i++){
+			$row = mysql_fetch_array($r);
+			$categoryId = $row['categoryId'];
+			$categoryName = $row['categoryName'];
 			$itemCountInCategory = 0;
 
 			if(!in_array($categoryId,$catArr)){
 				$catArr[] = $categoryId;
 			}else{
-				$categoryId = 999;
+				$categoryId = $categorySold;
 				$categoryName = '--- Classic Cars ARCHIVE';
 			}
 
-
 			$isClassified = false;
-			if($categoryId==2 || $categoryId==999) $isClassified = true;
-
+			if($categoryId==$categoryForSale || $categoryId==$categorySold) $isClassified = true;
 				
 			// coloured rows
-			$rowcolor = $CMSShared->GetRowColor($i,$colors);
-			$DataBuild .= '<li id="Category_'.$categoryId.'" style="background:'.$rowcolor.'">';
+			$rowColor = $CMSShared->GetRowColor($i,$colors);
+			$DataBuild .= '<li id="Category_'.$categoryId.'" style="background:'.$rowColor.'">';
 			
 			if(gp_enabled("price")){
-				$catTotal = get_category($categoryId,"stock_value",$thisList);
+				$catTotal = $categoryId==$categoryForSale || $categoryId==$categoryPlates ? get_category($categoryId,"stock_value",$thisList) : null;
 				$my_price_total += $catTotal;
-				$DataBuild .= '<span class="Price">'.$CMSTextFormat->Price_StripDecimal($catTotal).'</span>';
+				$DataBuild .= '<span class="Price">';
+				if($catTotal) $DataBuild .= $CMSTextFormat->Price_StripDecimal($catTotal);
+				$DataBuild .= '</span>';
 			}
 			
 			$DataBuild .= '<span class="Category">';
@@ -112,9 +111,8 @@ if( notloggedin()) {
 			
 			$q2 = "SELECT COUNT(c.id) AS itemCount, cc.id AS categoryId,cc.category AS categoryName,csc.id AS subcategoryId,csc.subcategory AS subcategoryName FROM stemmvog_csc2.catalogue AS c";
 			$q2 .= " join stemmvog_csc2.catalogue_subcats AS csc ON csc.id=c.subcategory";
-			$q2 .= " join stemmvog_csc2.catalogue_cats AS cc ON cc.id=c.category";
-			
-			if($categoryId==999){
+			$q2 .= " join stemmvog_csc2.catalogue_cats AS cc ON cc.id=c.category";			
+			if($categoryId==$categorySold){
 				$status = 2;
 				$q2 .= " WHERE cc.id=2";
 			}else{
@@ -125,46 +123,34 @@ if( notloggedin()) {
 			$q2 .= " GROUP BY csc.id ORDER BY cc.position ASC,csc.subcategory ASC";
 			$r2 = mysql_query($q2);
 
-			// if(!in_array($categoryId,$catArr)){
-				// $catArr[] = $categoryId;	
-				$DataBuild .= '<a href="javascript:OpenCloseSubcategory(\'subcategoryDiv'.$categoryId.'\');" id="subcategoryDiv'.$categoryId.'_Link" title="Show sub-categories for \''.$categoryName.'\'" class="subcategoryDivLink">Show / Hide</a>';
-				// $DataBuild .= ' &#124; <a href="'.$_SERVER['PHP_SELF'].'?thisList=catalogue_subcats&category='.$categoryId.'" title="Manage sub-categories">organise</a>';
+			$DataBuild .= '<a href="javascript:OpenCloseSubcategory(\'subcategoryDiv'.$categoryId.'\');" id="subcategoryDiv'.$categoryId.'_Link" title="Show sub-categories for \''.$categoryName.'\'" class="subcategoryDivLink">Show / Hide</a>';
+			// $DataBuild .= ' &#124; <a href="'.$_SERVER['PHP_SELF'].'?thisList=catalogue_subcats&category='.$categoryId.'" title="Manage sub-categories">organise</a>';
+			
+			$DataBuild .= '<span id="subcategoryDiv'.$categoryId.'" class="hidden">';
+			$DataBuild .= '<ul class="subcategoryList">';
+			for($sc=0;$sc<mysql_num_rows($r2);$sc++){
+				$scRow = mysql_fetch_array($r2);
+				$itemCount = $scRow['itemCount'];
+				$itemCountInCategory += $itemCount;
+				$categoryId = $scRow['categoryId'];
+				$categoryName = $scRow['categoryName'];
+				$subcategoryId = $scRow['subcategoryId'];
+				$subcategoryName = $scRow['subcategoryName'];
 				
-				$DataBuild .= '<span id="subcategoryDiv'.$categoryId.'" class="hidden">';
-				$DataBuild .= '<ul class="subcategoryList">';
-				for($sc=0;$sc<mysql_num_rows($r2);$sc++){
-					$scRow = mysql_fetch_array($r2);
-					$itemCount = $scRow['itemCount'];
-					$itemCountInCategory += $itemCount;
-					$categoryId = $scRow['categoryId'];
-					$categoryName = $scRow['categoryName'];
-					$subcategoryId = $scRow['subcategoryId'];
-					$subcategoryName = $scRow['subcategoryName'];
-					// print_r($scRow);
-					
-					$DataBuild .= '<li>';
-					// if($isClassified){
-					// 	$itemLabel = 'For Sale';
-					// }else{
-						$itemLabel = $itemCount.' items';
-					// }
-					
-					$DataBuild .= '<a href="admin_catalogue_all.php?status='.$status.'&category='.$categoryId.'&subcategory='.$subcategoryId.'" class="NoStyle">'.$itemLabel.'</a>';
-					// if($isClassified) $DataBuild .= '&nbsp;&#124;&nbsp;<a href="admin_catalogue_all.php?status=2&category='.$categoryId.'&subcategory='.$subcategoryId.'" class="NoStyle">SOLD</a>';
-					
-					$DataBuild .= ' in ';
-					// $DataBuild .= '<a href="admin_category_add.php?thisList=catalogue_subcats&editid='.$subcategoryId.'" title="Edit Sub-Category" class="NoStyle">'.$CMSTextFormat->ReduceString($subcategoryName,30).'</a>';
-					$DataBuild .= '<strong>'.$CMSTextFormat->ReduceString($subcategoryName,30).'</strong>';
-					$DataBuild .= '&nbsp;&#124;&nbsp;<a href="admin_catalogue_upload.php?category='.$categoryId.'&subcategory='.$subcategoryId.'" title="add item to this sub-category" class="NoStyle AddItem">add item</a>';
-					$DataBuild .= '</li>';
-					
-				}
-				//$DataBuild .= '<li></li>';
-				$DataBuild .= '</ul>';
-				$DataBuild .= '</span>';
-			// }else{
-			// 	$DataBuild .= '0 sub-categories';
-			// }
+				$DataBuild .= '<li>';					
+				$DataBuild .= '<a href="admin_catalogue_all.php?status='.$status.'&category='.$categoryId.'&subcategory='.$subcategoryId.'" class="NoStyle">'.$itemCount.' items</a>';
+				// if($isClassified) $DataBuild .= '&nbsp;&#124;&nbsp;<a href="admin_catalogue_all.php?status=2&category='.$categoryId.'&subcategory='.$subcategoryId.'" class="NoStyle">SOLD</a>';
+				
+				$DataBuild .= ' in ';
+				// $DataBuild .= '<a href="admin_category_add.php?thisList=catalogue_subcats&editid='.$subcategoryId.'" title="Edit Sub-Category" class="NoStyle">'.$CMSTextFormat->ReduceString($subcategoryName,30).'</a>';
+				$DataBuild .= '<strong>'.$CMSTextFormat->ReduceString($subcategoryName,30).'</strong>';
+				$DataBuild .= '&nbsp;&#124;&nbsp;<a href="admin_catalogue_upload.php?category='.$categoryId.'&subcategory='.$subcategoryId.'" title="add item to this sub-category" class="NoStyle AddItem">add item</a>';
+				$DataBuild .= '</li>';
+				
+			}
+			//$DataBuild .= '<li></li>';
+			$DataBuild .= '</ul>';
+			$DataBuild .= '</span>';
 			
 			if(gp_enabled("add_subcategory")) $DataBuild .= ' &#124; <a href="admin_category_add.php?thisList=catalogue_subcats&category='.$categoryId.'" title="add sub-category to this category" class="NoStyle AddItem">add sub-cat.</a>';
 
@@ -177,23 +163,21 @@ if( notloggedin()) {
 			$DataBuild .= '<span class="Actions">';
 				$DataBuild .= '<ul>';		
 
-				$DataBuild .= '<li><a href="admin_category_add.php?thisList='.$thisList.'&editid='.$categoryId.'&PrevPageCategory='.$cust_category.'" class="Edit" title="Edit Category"><span>Edit</span></a></li>';
-				
-				if( ($thisList=="catalogue_cats" && gp_enabled("delete_category")) || ($thisList=="catalogue_subcats" && gp_enabled("delete_subcategory")) ){
-					$DataBuild .= '<li><a href="admin_catalogue_all.php?category='.$categoryId;
-					if($thisList=="catalogue_cats"){
-						$DataBuild .= '&deleteCategory='.$categoryId;
-					}elseif($thisList=="catalogue_subcats"){
-						$DataBuild .= '&subcategory='.$subcategoryId.'&deleteSubCategory='.$subcategoryId.'&ParentCategoryID='.$categoryId;
-					}
-					$DataBuild .= '" class="Delete" title="Delete Category"><span>Delete</span></a></li>';
-				}
+				$DataBuild .= '<li><a href="admin_category_add.php?thisList='.$thisList.'&editid='.$categoryId.'&PrevPageCategory='.$cust_category.'" class="Edit" title="Edit Category"><span>Edit</span></a></li>';				
+				// if( ($thisList=="catalogue_cats" && gp_enabled("delete_category")) || ($thisList=="catalogue_subcats" && gp_enabled("delete_subcategory")) ){
+				// 	$DataBuild .= '<li><a href="admin_catalogue_all.php?category='.$categoryId;
+				// 	if($thisList=="catalogue_cats"){
+				// 		$DataBuild .= '&deleteCategory='.$categoryId;
+				// 	}elseif($thisList=="catalogue_subcats"){
+				// 		$DataBuild .= '&subcategory='.$subcategoryId.'&deleteSubCategory='.$subcategoryId.'&ParentCategoryID='.$categoryId;
+				// 	}
+				// 	$DataBuild .= '" class="Delete" title="Delete Category"><span>Delete</span></a></li>';
+				// }
 				$DataBuild .= '</ul>';
 				$DataBuild .= '</span>';
 			$DataBuild .= '</li>';						
 		}
-		$DataBuild .= '</ul>';			
-		
+		$DataBuild .= '</ul>';					
 		
 		// show Item Totals
 		if(gp_enabled("price")){
@@ -210,8 +194,6 @@ if( notloggedin()) {
 		echo $DataBuild;						
 	}
 	/// END /// if($thislist)	
-
 }
-include("includes/admin_pagefooter.php");
-	
+include("includes/admin_pagefooter.php");	
 ?>
