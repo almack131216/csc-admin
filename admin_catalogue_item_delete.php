@@ -170,8 +170,8 @@ if( notloggedin() ) {
 					if($fileOnly) $WarningPanel .= '<input type="hidden" name="fileOnly" value="1">';
 					$WarningPanel .= '<input type="hidden" name="prevpage" value="'.$my_prevpage.'">';
 					$WarningPanel .= '<input type="hidden" name="uid" value="'.$my_id.'">';
-					$WarningPanel .= '<input type="text" name="image_dir" value="'.$my_image_dir.'" readonly>';
-					$WarningPanel .= '<input type="text" name="parentid" value="'.$ParentID.'" readonly>';					
+					$WarningPanel .= '<input type="hidden" name="image_dir" value="'.$my_image_dir.'" readonly>';
+					$WarningPanel .= '<input type="hidden" name="parentid" value="'.$ParentID.'" readonly>';					
 					$WarningPanel .= '<input type="submit" name="delete" value="Delete" title="Delete Item" id="delete">';
 					$WarningPanel .= '</form>';		
 				$WarningPanel .= '</div>';

@@ -461,8 +461,8 @@
 			//////////////////////
 			///  ITEM PUBLISH DATE								
 			$BuildForm.= '<div class="panel_oneline">';
-			$BuildForm.= '<input type="text" name="image_dir" value="'.$_SESSION['ParentImgDir'].'" readonly>';
-			$BuildForm.= '<input type="text" name="ParentDate" value="'.$_SESSION['ParentDate'].'" readonly>';
+			$BuildForm.= '<input type="hidden" name="image_dir" value="'.$_SESSION['ParentImgDir'].'" readonly>';
+			$BuildForm.= '<input type="hidden" name="ParentDate" value="'.$_SESSION['ParentDate'].'" readonly>';
 			$BuildForm.= '<p><span class="steptitle">Step '.$stepnum.':</span> Publish date';
 			$BuildForm.= '<div class="inner_right">';
 			

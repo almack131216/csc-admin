@@ -9,6 +9,7 @@ $page_subtitle	= "Roll-over files to show their full name";
 
 include("includes/classes/PageBuild.php");
 $BuildPage .= $PageBuild->AddThickbox();
+$BuildPage .= $PageBuild->AddPageTitle("File Manage");
 include("includes/admin_pageheader.php");
 
 /////////// check to see if option is set
@@ -24,13 +25,15 @@ if( notloggedin() ) {
 	if(!empty($siteroot)){
 		$dir = $siteroot."uploads/";
 		$uploadPage = 'jquery_ui_widget.html';
-		if($_SESSION['quickname']=="mcw") $uploadPage = 'jquery_ui_widget_mcw.html';
+		// if($_SESSION['quickname']=="mcw") $uploadPage = 'jquery_ui_widget_mcw.html';
 
 
 		$SubNavInner = '<ul id="SubNavInner">';
 		//$SubNavInner .= '<li class="add"><a href="ThinUpload_applet.php" title="Use the drag-and-drop image resize and compression tool for uploading your photos">add files to file manager</a></li>';	
 		
-		$SubNavInner .= '<li class="add"><a href="plupload/examples/jquery/'.$uploadPage.'" title="Use the drag-and-drop image resize and compression tool for uploading your photos">add files to file manager</a></li>';		
+		// $SubNavInner .= '<li class="add"><a href="plupload/examples/jquery/'.$uploadPage.'" title="Use the drag-and-drop image resize and compression tool for uploading your photos">add files to file manager</a></li>';
+		$SubNavInner .= '<li class="add"><a href="file_manage_upload_options.php" title="Use the drag-and-drop image resize and compression tool for uploading your photos">add files to file manager</a></li>';
+		
 		$SubNavInner .= '</ul>';
 		echo $SubNavInner;
 		

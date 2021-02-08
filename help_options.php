@@ -68,12 +68,12 @@ include("includes/classes/CMSHelp.php");
 
 ?>
 	
-	<div class="panel">
+	<!-- <div class="panel">
 		<h2><a href="help_request.php" title="Email Technical Support">Technical support:</a></h2>
 		<p class="nopad">If you have any questions or suggestions, please <?php show_contact_admin(); ?> 
 		<br/>
 		If your query is <strong>URGENT</strong> then please call: <?php echo $amactive['tel']; ?></p>
-	</div>
+	</div> -->
 
 			
 <?php

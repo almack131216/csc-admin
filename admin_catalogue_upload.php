@@ -125,7 +125,7 @@ if($editid || $_REQUEST['id_xtra'] || ($_REQUEST['can'] || $_REQUEST['sid'])){
 $BuildPage .= $PageBuild->AddPageTitle($BuildTitle);
 $BuildPage .= $PageBuild->AddPageTip($BuildTip);
 $BuildPage .= $PageBuild->AddThickbox();
-$BuildPage .= $PageBuild->AddTag('JumpForms.js');
+$BuildPage .= $PageBuild->AddTag('JumpForms.js?v=3');
 $BuildPage .= $PageBuild->AddTag('mootools2.css');
 $BuildPage .= $PageBuild->AddTag(array('dir'=>'addingajax/','file'=>'addingajax.js'));
 if(!$editid) $BuildPage .= $PageBuild->AddTag('forms_clickclear.js');
@@ -284,12 +284,12 @@ if( notloggedin() ) {
 				
 			//////////////////////
 			/// CHECK PRICE CHANGE			
-			if ($isAddParent && isset($_POST['price']) && !empty($_POST['price']) ) {		
+			if (($isAddParent || $isEditParent) && isset($_POST['price']) && !empty($_POST['price']) ) {		
 				$price = $_POST['price'];
 				$price = $CMSTextFormat->stripCrap2_in($price);				
 				$price = $CMSTextFormat->Price_ForceNumeric($price);										
 			}
-			if ($isAddParent && isset($_POST['price2']) && !empty($_POST['price2']) ) {		
+			if (($isAddParent || $isEditParent) && isset($_POST['price2']) && !empty($_POST['price2']) ) {		
 				$price2 = $_POST['price2'];
 				$price2 = $CMSTextFormat->stripCrap2_in($price2);				
 				$price2 = $CMSTextFormat->Price_ForceNumeric($price2);										
@@ -384,14 +384,14 @@ if( notloggedin() ) {
 						$query .= ", ${FieldNames[$i]}";
 					}
 					if($isAddParent){
-						$query .= ",date,image_dir";
+						$query .= ",date,image_dir,image_hi";
 					}
 					$query .= ") VALUES ('$my_id_xtra','$UploadFileName'";//,'$UploadFileName'
 					for($i=0;$i<sizeof($FieldNames);$i++){
 						$query .= ", '${$FieldNames[$i]}'";
 					}
 					if($isAddParent){
-						$query .= ",'".$TheDayToday."','".$TheDayToday_image_dir."'";//2do
+						$query .= ",'".$TheDayToday."','".$TheDayToday_image_dir."','1'";//2do
 					}
 					$query .= ")";
 					echo $query;
@@ -598,7 +598,7 @@ if( notloggedin() ) {
 				mysql_close();
 				$_FILES = array(); //Destroy variables
 				
-				if ($isAddParent) {
+				if (($isAddParent || $isEditParent)) {
 					$ParentID = $uid;
 				}else{
 					$ParentID = $my_id_xtra;
