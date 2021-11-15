@@ -7,6 +7,8 @@
 		'category','subcategory',
 		'description',
 		'keywords',
+		'related',
+		'youtube',
 		'upload_date','spare_date',
 		'status'
 	);
@@ -16,7 +18,7 @@
 	//$FieldNames[] = 'detail_1';
 	//$FieldNames[] = 'detail_2';
 	//echo '<p>(FB): FieldName: '.print_r($FieldNames).'</p>';					
-	// VALUES ('$id_xtra', '0', '999', '0', '$name', '$detail_1', '$detail_2', '$detail_3', '$detail_4', '$detail_5', '$detail_6', '$detail_7', '$detail_8', '$detail_9', '$detail_10', '$price', '$price2', '$category', '$subcategory', '$description', '$keywords', '$UploadFileName', '$UploadFileName', '$upload_date', '$spare_date', '$status', '$price_details')
+	// VALUES ('$id_xtra', '0', '999', '0', '$name', '$detail_1', '$detail_2', '$detail_3', '$detail_4', '$detail_5', '$detail_6', '$price', '$price2', '$category', '$subcategory', '$description', '$keywords', '$related', '$youtube', '$UploadFileName', '$UploadFileName', '$upload_date', '$spare_date', '$status', '$price_details')
 
 				
 				
@@ -30,6 +32,8 @@
 		if($CMSTextFormat->StringContains($my_d,"<w:WordDocument>")) $my_d = '<p><strong>ERROR: Text failed to save - please use the "Paste as Plain Text" button when pasting text</strong></p>';
 
 		$my_keywords = $edit_arr['keywords'];
+		$my_related = $edit_arr['related'];
+		$my_youtube = $edit_arr['youtube'];
 		$my_name = stripslashes($edit_arr['name']);
 		$my_name_xtra = $edit_arr['name'];
 		
@@ -86,6 +90,8 @@
 		$my_id_xtra = 0;
 		$my_d = '';//$gp_defVal_item['description'];
 		$my_keywords = '';//$gp_defVal_item['keywords'];
+		$my_related = '';//$gp_defVal_item['related'];
+		$my_youtube = '';//$gp_defVal_item['youtube'];
 		$my_name = '';//$gp_defVal_item['name'];
 		$my_name_xtra = '';//$gp_defVal_item['name_xtra'];
 		$my_detail_1 = $_REQUEST['detail_1'];//$gp_defVal_item['detail_1'];
@@ -93,16 +99,7 @@
 		$my_detail_3 = $_REQUEST['detail_3'];//$gp_defVal_item['detail_3'];
 		$my_detail_4 = $_REQUEST['detail_4'];//$gp_defVal_item['detail_4'];
 		$my_detail_5 = $_REQUEST['detail_5'];//$gp_defVal_item['detail_5'];
-		$my_detail_6 = $_REQUEST['detail_6'];
-		$my_detail_7 = $_REQUEST['detail_7'];
-		$my_detail_8 = $_REQUEST['detail_8'];
-		$my_detail_9 = $_REQUEST['detail_9'];
-		$my_detail_10 = $_REQUEST['detail_10'];
-		$my_detail_11 = $_REQUEST['detail_11'];
-		$my_detail_12 = $_REQUEST['detail_12'];
-		$my_detail_13 = $_REQUEST['detail_13'];
-		$my_detail_14 = $_REQUEST['detail_14'];
-		$my_detail_15 = $_REQUEST['detail_15'];			
+		$my_detail_6 = $_REQUEST['detail_6'];		
 		if(!$my_cat) $my_cat	= '';//$gp_defVal_item['category'];
 		if(!$my_subcat) $my_subcat	= '';//$gp_defVal_item['subcategory'];
 		$my_status = 1;

@@ -234,6 +234,8 @@ if( notloggedin() ) {
 			//INITIALISE empty values in-case nothing is picked up (avoids 'else' conditions on EVERY field)
 			$description = '';
 			$keywords = '';
+			$related = '';
+			$youtube = '';
 			$name = '';
 			for($i=0;$i<count($CustomDetails);$i++){
 				if($CustomDetails[$i]['inuse']==1) ${"detail_".$CustomDetails[$i]['id']} = '';
@@ -257,7 +259,9 @@ if( notloggedin() ) {
 				if($CustomDetails[$i]['inuse']==1 && $_POST['detail_'.$CustomDetails[$i]['id']] == $gp_defVal_item['detail_'.$CustomDetails[$i]['id']])		$_POST['detail_'.$CustomDetails[$i]['id']] = "";
 			}
 			if($_POST['description']	== $gp_defVal_item['description']){		$_POST['description'] = "";}
-			if($_POST['keywords']		== $gp_defVal_item['keywords']){		$_POST['keywords'] = "";}		
+			if($_POST['keywords']		== $gp_defVal_item['keywords']){		$_POST['keywords'] = "";}
+			if($_POST['related']		== $gp_defVal_item['related']){			$_POST['related'] = "";}
+			if($_POST['youtube']		== $gp_defVal_item['youtube']){			$_POST['youtube'] = "";}		
 			
 			/////////////////////////////
 			/// check for name (required)
@@ -308,6 +312,20 @@ if( notloggedin() ) {
 				$keywords_original = $_POST['keywords'];
 				$keywords = $CMSTextFormat->stripCrap2_in_body($keywords_original);	
 				$keywords = $CMSTextFormat->LanguageFilter($keywords);			
+			}
+			/// check for related (not mandatory)
+			if (!empty($_POST['related']) && $post_success!=0) {
+				//$related = $CMSTextFormat->stripCrap2_in($_POST['related']);				
+				$related_original = $_POST['related'];
+				$related = $CMSTextFormat->stripCrap2_in_body($related_original);	
+				// $related = $CMSTextFormat->LanguageFilter($related);			
+			}
+			/// check for youtube (not mandatory)
+			if (!empty($_POST['youtube']) && $post_success!=0) {
+				//$youtube = $CMSTextFormat->stripCrap2_in($_POST['youtube']);				
+				$youtube_original = $_POST['youtube'];
+				$youtube = $CMSTextFormat->stripCrap2_in_body($youtube_original);	
+				// $youtube = $CMSTextFormat->LanguageFilter($youtube);			
 			}
 			/// check for details (not required)
 			for($i=0;$i<count($CustomDetails);$i++){
@@ -371,13 +389,13 @@ if( notloggedin() ) {
 						//if(${"detail_".$i}) 
 						if($CustomDetails[$i]['inuse']==1) $query .= ", detail_".$CustomDetails[$i]['id']."='${"detail_".$CustomDetails[$i]['id']}'";
 					}
-					$query .= ", price='$price', price2='$price2', category='$category', subcategory='$subcategory', description='$description', keywords='$keywords', upload_date='$upload_date', spare_date='$spare_date', status='$status', price_details='$price_details' WHERE id='$editid'";
+					$query .= ", price='$price', price2='$price2', category='$category', subcategory='$subcategory', description='$description', keywords='$keywords', related='$related', youtube='$youtube', upload_date='$upload_date', spare_date='$spare_date', status='$status', price_details='$price_details' WHERE id='$editid'";
 					$result = $db->mysql_query_log($query);
 					$uid = $editid;
 				}else{
 					$debug .= '<br>!!! SQL !!! INSERT';
 					if($category=='any') $category=0;
-					//REFERENCE: $query = "INSERT into $db_clientTable_catalogue (id_xtra, position_incat, position_initem, position, name, detail_1, detail_2, detail_3, detail_4, detail_5, detail_6, detail_7, detail_8, detail_9, detail_10, price, price2, category, subcategory, description, keywords, image_large, image_small, upload_date, spare_date, status, price_details) VALUES ('$my_id_xtra', '0', '999', '0', '$name', '$detail_1', '$detail_2', '$detail_3', '$detail_4', '$detail_5', '$detail_6', '$detail_7', '$detail_8', '$detail_9', '$detail_10', '$price', '$price2', '$category', '$subcategory', '$description', '$keywords', '$UploadFileName', '$UploadFileName', '$upload_date', '$spare_date', '$status', '$price_details')";
+					//REFERENCE: $query = "INSERT into $db_clientTable_catalogue (id_xtra, position_incat, position_initem, position, name, detail_1, detail_2, detail_3, detail_4, detail_5, detail_6, price, price2, category, subcategory, description, keywords, image_large, image_small, upload_date, spare_date, status, price_details) VALUES ('$my_id_xtra', '0', '999', '0', '$name', '$detail_1', '$detail_2', '$detail_3', '$detail_4', '$detail_5', '$detail_6', '$price', '$price2', '$category', '$subcategory', '$description', '$keywords', '$related', '$youtube', '$UploadFileName', '$UploadFileName', '$upload_date', '$spare_date', '$status', '$price_details')";
 					
 					$query = "INSERT into $db_clientTable_catalogue (id_xtra,image_large";//,image_small
 					for($i=0;$i<sizeof($FieldNames);$i++){
@@ -660,7 +678,7 @@ if( notloggedin() ) {
 				}
 			}
 			
-			if(!$suid && gp_enabled("related")) $SubNavInner .= '<li class="related"><a href="admin_catalogue_item_related.php?editid='.$ParentID.'" title="related information & documents">related</a></li>';
+			if(!$suid && gp_enabled("related_x")) $SubNavInner .= '<li class="related"><a href="admin_catalogue_item_related.php?editid='.$ParentID.'" title="related information & documents">related</a></li>';
 			//$SubNavInner .= '<li class="list"><a href="admin_catalogue_all.php?thisList=catalogue_cats&category='.$my_ParentCat.'" title="this category">this category</a></li>';
 			if(!$suid) $SubNavInner .= '<li class="delete"><a href="admin_catalogue_item_delete.php?uid='.$editid.'&parentid='.$ParentID.'&prevpage=item_edit" title="delete '.$CommonCustomWords['item'].'">delete</a></li>';		
 			$SubNavInner .= '</ul>';

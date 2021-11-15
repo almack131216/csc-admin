@@ -308,7 +308,8 @@
 				$BuildForm.= '<div class="inner_right">';			
 					//$BuildForm.= '<select class="medium" id="subcategory" name="subcategory" style="display:none;">';
 					//$BuildForm.= '</select>';
-					$tmpCatQuery = "SELECT * FROM $db_clientTable_catalogue_subcats WHERE category=$my_cat OR category=1 ORDER BY position_incat asc";
+					$tmpCatQuery = "SELECT * FROM $db_clientTable_catalogue_subcats WHERE category=$my_cat OR category=1 ORDER BY subcategory ASC";
+					// if($my_cat==13) $tmpCatQuery = "SELECT * FROM $db_clientTable_catalogue_subcats WHERE category=2 OR category=1 ORDER BY subcategory ASC";
 					$tmpCatResult = mysql_query($tmpCatQuery);
 					if($tmpCatResult && mysql_num_rows($tmpCatResult)==0) $tmpCatQuery = "SELECT * FROM $db_clientTable_catalogue_subcats ORDER BY subcategory ASC";
 					$ListPropsArr = array('name'=>'subcategory','query'=>$tmpCatQuery,'dbTable_field'=>'subcategory','query_qty'=>"SELECT * FROM $db_clientTable_catalogue WHERE subcategory=",'selected'=>$my_subcat,'optionValue'=>'','adding'=>true);
@@ -408,6 +409,8 @@
 					}else{
 						if($CMSTextFormat->StringContains($CustomDetails[$detail_id]['name'],"brief description") || $CMSTextFormat->StringContains($CustomDetails[$detail_id]['name'],"keywords")){							
 							$BuildList .= '<textarea id="detail_'.$detail_id.'" name="detail_'.$detail_id.'" cols="80" rows="7">'.$tmp_value.'</textarea>';
+						}elseif($CMSTextFormat->StringContains($CustomDetails[$detail_id]['name'],"related") || $CMSTextFormat->StringContains($CustomDetails[$detail_id]['name'],"youtube")){
+							$BuildList .= '???';
 						}else{
 							$BuildList .= '<input type="text" id="detail_'.$detail_id.'" name="detail_'.$detail_id.'" value="'.$tmp_value.'" class="details" title="'.$CustomDetails[$detail_id]['name'].'?">';
 						}
@@ -445,10 +448,40 @@
 		//STEP 8: GIVE KEYWORDS
 		if(empty($my_id_xtra) && gp_enabled('keywords') && !FieldDisabled(array('category'=>$my_cat,'fieldname'=>'keywords'))){
 			$BuildForm.= '<div class="panel_oneline">';
-			$BuildForm.= '<p><label for="keywords">Step '.$stepnum.':</label> Enter keywords (<a href="javascript:OpenClose(\'KeywordsField\');" title="add keywords to this item">Show Keywords Field</a>)<br /><br />';
+			$BuildForm.= '<p><label for="keywords">Step '.$stepnum.':</label> Enter keywords (<a href="javascript:OpenClose(\'KeywordsField\');" title="add keywords to this item">Show Keywords Field</a>)<br />';
 				$BuildForm.= '<strong>TIP:</strong> '.$gp_defVal_item['keywords'].'</p>';
 				$BuildForm.= '<div id="KeywordsField" style="display:none;clear:both;float:left;width:700px;margin-top:20px;">';
 				$BuildForm.= '<textarea id="keywords" name="keywords" cols="125" rows="5">'.$my_keywords.'</textarea>';
+				$BuildForm.= '</div>';
+			$BuildForm.= '</div>';
+			$stepnum++;
+		}
+
+		//////////////////////////////////
+		///////////////////////////////////
+		//STEP ?: YOUTUBE
+		// $BuildForm.= '??? YouTube: '.gp_enabled('youtube').'___'.$gp_defVal_item['youtube'].'____'.$my_youtube;
+		if(empty($my_id_xtra) && gp_enabled('youtube') && !FieldDisabled(array('category'=>$my_cat,'fieldname'=>'youtube'))){
+			$BuildForm.= '<div class="panel_oneline">';
+			$BuildForm.= '<p><label for="youtube">Step '.$stepnum.':</label> Enter youtube ID';
+				$BuildForm.= '<br /><strong>TIP:</strong> '.$gp_defVal_item['youtube'].'</p>';
+				$BuildForm.= '<div class="inner_right">';				
+				$BuildForm.= '<input type="text" id="youtube" name="youtube" value="'.$my_youtube.'">';
+				$BuildForm.= '</div>';
+			$BuildForm.= '</div>';
+			$stepnum++;
+		}
+
+		//////////////////////////////////
+		///////////////////////////////////
+		//STEP ?: RELATED
+		// $BuildForm.= '??? RELATED: '.gp_enabled('related').'___'.$gp_defVal_item['related'].'____'.$my_related;
+		if(empty($my_id_xtra) && gp_enabled('related') && !FieldDisabled(array('category'=>$my_cat,'fieldname'=>'related'))){
+			$BuildForm.= '<div class="panel_oneline">';
+			$BuildForm.= '<p><label for="related">Step '.$stepnum.':</label> Enter related ID\'s';
+				$BuildForm.= '<br /><strong>TIP:</strong> '.$gp_defVal_item['related'].'</p>';
+				$BuildForm.= '<div class="inner_right">';				
+				$BuildForm.= '<input type="text" id="related" name="related" value="'.$my_related.'">';
 				$BuildForm.= '</div>';
 			$BuildForm.= '</div>';
 			$stepnum++;
@@ -588,7 +621,17 @@
 				$BuildForm.= '<div class="panel_oneline">';
 				$BuildForm.= '<p class="middle"><span class="steptitle">Step '.$stepnum.':</span> Assign sub-category</p>';
 					$BuildForm.= '<div class="inner_right">';
-					$ListPropsArr = array('name'=>'subcategory','query'=>"SELECT * FROM $db_clientTable_catalogue_subcats WHERE category={$cust_category} OR category=1 ORDER BY subcategory ASC",'dbTable_field'=>'subcategory','query_qty'=>"SELECT * FROM $db_clientTable_catalogue WHERE category={$cust_category}&subcategory=",'selected'=>$_REQUEST['subcategory'],'pleaseselect'=>'','optionValue'=>$_SERVER['PHP_SELF'].'?category='.$cust_category.'&subcategory=','adding'=>true,'jump'=>true);
+					$tmpCategory = $cust_category;//$cust_category == 13 ? 2 : $cust_category;
+					$ListPropsArr = array('name'=>'subcategory',
+						'query'=>"SELECT * FROM $db_clientTable_catalogue_subcats WHERE category={$tmpCategory} OR category=1 ORDER BY subcategory ASC",
+						'dbTable_field'=>'subcategory',
+						'query_qty'=>"SELECT * FROM $db_clientTable_catalogue WHERE category={$cust_category}&subcategory=",
+						'selected'=>$_REQUEST['subcategory'],
+						'pleaseselect'=>'',
+						'optionValue'=>$_SERVER['PHP_SELF'].'?category='.$tmpCategory.'&subcategory=',
+						'adding'=>true,
+						'jump'=>true
+					);
 					if(empty($_REQUEST['subcategory'])) $ListPropsArr['pleaseselect']='Please choose...';
 					$BuildForm.= $CMSSelectOptions->Build($ListPropsArr);				
 					$BuildForm.= '</div>';
