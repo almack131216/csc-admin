@@ -44,10 +44,15 @@ if( notloggedin()) {
 } else {
 	$categoryForSale = 2;
 	$categorySold = 999;
+	$categoryHidden = 998;
 	$categoryPlates = 6;
 
-	$q = "SELECT cc.id AS categoryId,cc.category AS categoryName FROM stemmvog_csc2.catalogue_cats AS cc ORDER BY cc.position ASC";
-	$q = "SELECT cc.position,cc.id AS categoryId,cc.category AS categoryName FROM stemmvog_csc2.catalogue_cats AS cc UNION ALL SELECT cc2.position,cc2.id AS categoryId,cc2.category AS categoryName FROM stemmvog_csc2.catalogue_cats AS cc2 WHERE cc2.id=2 ORDER BY position ASC";
+	// $q = "SELECT cc.id AS categoryId,cc.category AS categoryName FROM stemmvog_csc2.catalogue_cats AS cc ORDER BY cc.position ASC";
+	$q = "SELECT cc.position,cc.id AS categoryId,cc.category AS categoryName";
+	$q .= " FROM stemmvog_csc2.catalogue_cats AS cc";
+	$q .= " UNION ALL SELECT cc2.position,cc2.id AS categoryId,cc2.category AS categoryName FROM stemmvog_csc2.catalogue_cats AS cc2 WHERE cc2.id=2";
+	$q .= " UNION ALL SELECT cc3.position,cc3.id AS categoryId,cc3.category AS categoryName FROM stemmvog_csc2.catalogue_cats AS cc3 WHERE cc3.id=2";
+	$q .= " ORDER BY position ASC";
 	$r = mysql_query($q);
 
 	$catArr = [];
@@ -81,15 +86,26 @@ if( notloggedin()) {
 			$categoryName = $row['categoryName'];
 			$itemCountInCategory = 0;
 
+			// echo '<br>??? $categoryId: '.$categoryId.', $catArr: '.print_r($catArr);
 			if(!in_array($categoryId,$catArr)){
 				$catArr[] = $categoryId;
 			}else{
-				$categoryId = $categorySold;
-				$categoryName = '--- Classic Cars ARCHIVE';
+				// echo '<br>--->(IN CAT) categoryId = '.$categoryId;
+				if($categoryId == 2 && !in_array($categorySold,$catArr)){
+					$catArr[] = $categorySold;
+					$categoryId = $categorySold;
+					$categoryName = '--- Classic Cars ARCHIVE';
+				}
+				if($categoryId == 2 && !in_array($categoryHidden,$catArr)){
+					$catArr[] = $categoryHidden;
+					$categoryId = $categoryHidden;
+					$categoryName = '--- Classic Cars HIDDEN';
+				}
+				
 			}
 
 			$isClassified = false;
-			if($categoryId==$categoryForSale || $categoryId==$categorySold) $isClassified = true;
+			if($categoryId==$categoryForSale || $categoryId==$categorySold || $categoryId==$categoryHidden) $isClassified = true;
 				
 			// coloured rows
 			$rowColor = $CMSShared->GetRowColor($i,$colors);
@@ -115,6 +131,9 @@ if( notloggedin()) {
 			if($categoryId==$categorySold){
 				$status = 2;
 				$q2 .= " WHERE cc.id=2";
+			}elseif($categoryId==$categoryHidden){
+				$status = 0;
+				$q2 .= " WHERE cc.id=2";
 			}else{
 				$status = 1;
 				$q2 .= " WHERE cc.id=$categoryId";				
@@ -122,6 +141,7 @@ if( notloggedin()) {
 			$q2 .= " AND c.status=$status";
 			$q2 .= " GROUP BY csc.id ORDER BY cc.position ASC,csc.subcategory ASC";
 			$r2 = mysql_query($q2);
+			// echo $q2;
 
 			$DataBuild .= '<a href="javascript:OpenCloseSubcategory(\'subcategoryDiv'.$categoryId.'\');" id="subcategoryDiv'.$categoryId.'_Link" title="Show sub-categories for \''.$categoryName.'\'" class="subcategoryDivLink">Show / Hide</a>';
 			// $DataBuild .= ' &#124; <a href="'.$_SERVER['PHP_SELF'].'?thisList=catalogue_subcats&category='.$categoryId.'" title="Manage sub-categories">organise</a>';

@@ -326,7 +326,7 @@
 	$CMSShared = new CMSShared();
 	$TheDayToday = date('Y-m-d');
 	$queryDate = "((c.spare_date>'$TheDayToday' OR c.spare_date='0000-00-00')";
-	if($cust_status) $queryDate .= " AND c.status=$cust_status";
+	if(isset($cust_status)) $queryDate .= " AND c.status=$cust_status";
 	$queryDate .= ")";
 	$queryDateExpired = "(c.status=2 OR c.spare_date<'$TheDayToday')";
 
